@@ -1,0 +1,4 @@
+#bookListTable th {
+    cursor: pointer;
+    width: 25%;
+}

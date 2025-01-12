@@ -1,0 +1,18 @@
+#addBookTable td{
+    border: none;
+}
+
+#mainWrap {
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+#addAuthSuccessMessage {
+    color: rgb(18, 171, 43);
+    display: none;
+}
+
+#addAuthErrorMessage {
+    color: rgba(183, 13, 13, 0.759);
+    display: none;
+}

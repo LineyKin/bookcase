@@ -1,0 +1,83 @@
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+    networks:
+      - kafka-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+    networks:
+      - kafka-network
+
+  main:
+    build:
+      context: ./bookcase_main
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka
+    env_file:
+      - .env
+    networks:
+      - kafka-network
+    ports:
+      - "1991:1991"
+    volumes:
+      - ./bookcase_main:/usr/src/app
+    command: go run cmd/bookcase/main.go
+
+  log:
+    build:
+      context: ./bookcase_log
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka
+    env_file:
+      - .env
+    networks:
+      - kafka-network
+    ports:
+      - "1992:1992"
+    volumes:
+      - ./bookcase_log:/usr/src/app
+    command: go run cmd/bookcase_log/main.go
+
+  db1:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DBNAME}
+    networks:
+      - kafka-network
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+  db2:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DBNAME_LOG}
+    networks:
+      - kafka-network
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+volumes:
+  postgres-db:
+
+networks:
+  kafka-network:
+    driver: bridge
