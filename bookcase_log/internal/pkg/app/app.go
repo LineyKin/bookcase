@@ -1,19 +1,26 @@
 package app
 
 import (
+	"bookcase_log/internal/handlers"
 	"bookcase_log/internal/kafka/consumer"
 	"bookcase_log/internal/storage"
+	"bookcase_log/lib/env"
 	"database/sql"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/gin-gonic/gin"
 )
 
 type App struct {
 	Storage       *storage.Storage
 	kafkaConsumer *consumer.KafkaConsumer
+	hand          *handlers.Handlers
+
+	gin *gin.Engine
 }
 
 func New(db *sql.DB) (*App, error) {
@@ -22,11 +29,20 @@ func New(db *sql.DB) (*App, error) {
 	// слой хранилища
 	a.Storage = storage.New(db)
 
+	// слой эндпоинтов
+	a.hand = handlers.New()
+
+	// роутер
+	a.gin = gin.Default()
+
+	// ручка для главной страницы
+	a.gin.GET("/", a.hand.FileServer)
+
 	// брокер сообщений кафка (получатель)
 	kc, err := consumer.New()
 	if err != nil {
 		log.Println("can't make kafka consumer: ", err)
-		return nil, err
+		log.Println("kc == nil :", kc == nil)
 	}
 
 	a.kafkaConsumer = kc
@@ -36,9 +52,27 @@ func New(db *sql.DB) (*App, error) {
 
 func (a *App) Run() error {
 
+	port := env.GetPort()
+	fmt.Printf("http://localhost:%s/\n", port)
+	err := a.gin.Run(":" + port)
+	if err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
+
+	if a.kafkaConsumer != nil {
+		err = runKafkaConsumer(a.kafkaConsumer)
+		if err != nil {
+			log.Println("consumer error: ", err)
+		}
+	}
+
+	return nil
+}
+
+func runKafkaConsumer(kc *consumer.KafkaConsumer) error {
 	msgCnt := 0
 
-	consumer, err := a.kafkaConsumer.Partition()
+	consumer, err := kc.Partition()
 	if err != nil {
 		log.Println("kafka partition error: ", err)
 		return err
@@ -76,7 +110,7 @@ func (a *App) Run() error {
 	fmt.Println("Processed", msgCnt, "messages")
 
 	// 4. Close the consumer on exit.
-	if err := a.kafkaConsumer.Close(); err != nil {
+	if err := kc.Close(); err != nil {
 		return err
 	}
 
