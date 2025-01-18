@@ -42,7 +42,6 @@ func New(db *sql.DB) (*App, error) {
 	kc, err := consumer.New()
 	if err != nil {
 		log.Println("can't make kafka consumer: ", err)
-		log.Println("kc == nil :", kc == nil)
 	}
 
 	a.kafkaConsumer = kc
@@ -52,6 +51,10 @@ func New(db *sql.DB) (*App, error) {
 
 func (a *App) Run() error {
 
+	if a.kafkaConsumer != nil {
+		go runKafkaConsumer(a.kafkaConsumer)
+	}
+
 	port := env.GetPort()
 	fmt.Printf("http://localhost:%s/\n", port)
 	err := a.gin.Run(":" + port)
@@ -59,23 +62,15 @@ func (a *App) Run() error {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 
-	if a.kafkaConsumer != nil {
-		err = runKafkaConsumer(a.kafkaConsumer)
-		if err != nil {
-			log.Println("consumer error: ", err)
-		}
-	}
-
 	return nil
 }
 
-func runKafkaConsumer(kc *consumer.KafkaConsumer) error {
+func runKafkaConsumer(kc *consumer.KafkaConsumer) {
 	msgCnt := 0
 
 	consumer, err := kc.Partition()
 	if err != nil {
 		log.Println("kafka partition error: ", err)
-		return err
 	}
 
 	log.Println("Consumer successfully started")
@@ -89,30 +84,29 @@ func runKafkaConsumer(kc *consumer.KafkaConsumer) error {
 
 	// 3. Create a Goroutine to run the consumer / worker.
 	doneCh := make(chan struct{})
-	go func() {
-		for {
-			select {
-			case err := <-consumer.Errors():
-				fmt.Println(err)
-			case msg := <-consumer.Messages():
-				msgCnt++
-				fmt.Printf("Received order Count %d: | Topic(%s) | Message(%s) \n", msgCnt, string(msg.Topic), string(msg.Value))
-				order := string(msg.Value)
-				fmt.Printf("Добавлен новый автор: %s\n", order)
-			case <-sigchan:
-				fmt.Println("Interrupt is detected")
-				doneCh <- struct{}{}
-			}
+	//go func() {
+	for {
+		select {
+		case err := <-consumer.Errors():
+			fmt.Println(err)
+		case msg := <-consumer.Messages():
+			msgCnt++
+			fmt.Printf("Received order Count %d: | Topic(%s) | Message(%s) \n", msgCnt, string(msg.Topic), string(msg.Value))
+			order := string(msg.Value)
+			fmt.Printf("Добавлен новый автор: %s\n", order)
+		case <-sigchan:
+			fmt.Println("Interrupt is detected")
+			doneCh <- struct{}{}
 		}
-	}()
+	}
+	//}()
 
 	<-doneCh
 	fmt.Println("Processed", msgCnt, "messages")
 
 	// 4. Close the consumer on exit.
 	if err := kc.Close(); err != nil {
-		return err
+		log.Println("can't close consumer: ", err)
 	}
 
-	return nil
 }

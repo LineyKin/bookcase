@@ -9,8 +9,6 @@ import (
 
 func main() {
 
-	log.Println("fix 1")
-
 	// 1. подключение к БД
 	appDB, err := db.InitPostgresDb()
 	if err != nil {
