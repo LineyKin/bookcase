@@ -1,5 +1,6 @@
 services:
   zookeeper:
+    container_name: bookcase_zookeeper
     image: confluentinc/cp-zookeeper:latest
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
@@ -7,6 +8,7 @@ services:
       - kafka-network
 
   kafka:
+    container_name: bookcase_kafka
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
@@ -17,6 +19,7 @@ services:
       - kafka-network
 
   main:
+    container_name: bookcase_main
     build:
       context: ./bookcase_main
       dockerfile: Dockerfile
@@ -33,6 +36,7 @@ services:
     command: go run cmd/bookcase/main.go
 
   log:
+    container_name: bookcase_log
     build:
       context: ./bookcase_log
       dockerfile: Dockerfile
@@ -49,6 +53,7 @@ services:
     command: go run cmd/bookcase_log/main.go
 
   db1:
+    container_name: bookcase_main_db
     image: postgres:alpine
     environment:
       - POSTGRES_USER=${PG_USER}
@@ -62,6 +67,7 @@ services:
       - postgres-db:/var/lib/postgresql/data
 
   db2:
+    container_name: bookcase_log_db
     image: postgres:alpine
     environment:
       - POSTGRES_USER=${PG_USER}

@@ -123,6 +123,7 @@ func (ctrl *Controller) AddAuthor(c *gin.Context) {
 	}
 
 	// data for kafka
+	author.Id = id
 	authorInBytes, err := json.Marshal(author)
 	if err != nil {
 		log.Println("can't prepare data for kafka: ", err)
