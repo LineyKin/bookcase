@@ -4,11 +4,13 @@ import (
 	"bookcase_log/lib/env"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/IBM/sarama"
 )
 
 const TOPIC = "bookcase_log"
+const CONNECTION_TIME_LIMIT = 10
 
 type KafkaConsumer struct {
 	consumer sarama.Consumer
@@ -22,9 +24,30 @@ func connectConsumer(brokers []string) (sarama.Consumer, error) {
 	return sarama.NewConsumer(brokers, config)
 }
 
+func getBrokers() []string {
+	return []string{
+		fmt.Sprintf("kafka:%s", env.GetKafkaPort()),
+	}
+}
+
+func hasTimeToConnect(startTimeStamp time.Time) bool {
+	now := time.Now()
+	dur := now.Sub(startTimeStamp)
+	log.Println("connecting time: ", dur)
+
+	return int(dur.Seconds()) < CONNECTION_TIME_LIMIT
+}
+
 func New() (*KafkaConsumer, error) {
-	broker := fmt.Sprintf("kafka:%s", env.GetKafkaPort())
-	worker, err := connectConsumer([]string{broker})
+	brokers := getBrokers()
+	worker, err := connectConsumer(brokers)
+	startTimeStamp := time.Now()
+	for err != nil && hasTimeToConnect(startTimeStamp) {
+		log.Println("connection error: ", err)
+		log.Println("connecting to kafka...")
+		worker, err = connectConsumer(brokers)
+	}
+
 	if err != nil {
 		log.Println("can't connect to kafka consumer", err)
 		return nil, err
