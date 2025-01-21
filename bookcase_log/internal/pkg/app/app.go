@@ -4,7 +4,6 @@ import (
 	"bookcase_log/internal/handlers"
 	"bookcase_log/internal/kafka/consumer"
 	"bookcase_log/internal/storage"
-	"bookcase_log/lib/env"
 	"database/sql"
 	"fmt"
 	"log"
@@ -55,9 +54,7 @@ func (a *App) Run() error {
 		go runKafkaConsumer(a.kafkaConsumer)
 	}
 
-	port := env.GetPort()
-	fmt.Printf("http://localhost:%s/\n", port)
-	err := a.gin.Run(":" + port)
+	err := a.gin.Run(":1992")
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}

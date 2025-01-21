@@ -1,8 +1,6 @@
 package consumer
 
 import (
-	"bookcase_log/lib/env"
-	"fmt"
 	"log"
 	"time"
 
@@ -26,7 +24,7 @@ func connectConsumer(brokers []string) (sarama.Consumer, error) {
 
 func getBrokers() []string {
 	return []string{
-		fmt.Sprintf("kafka:%s", env.GetKafkaPort()),
+		"kafka:9092",
 	}
 }
 
