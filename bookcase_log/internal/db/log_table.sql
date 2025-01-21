@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS logs (
 		producer_ts TIMESTAMP,
 		consumer_ts TIMESTAMP,
 		message_id INTEGER,
-		topic VARCHAR(256) NOT NULL DEFAULT ''
-		message VARCHAR(256) NOT NULL DEFAULT ''
+		topic VARCHAR(256) NOT NULL DEFAULT '',
+		message TEXT NOT NULL DEFAULT ''
 	);
