@@ -64,7 +64,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - postgres-db:/var/lib/postgresql/data
+      - postgres-db-main:/var/lib/postgresql/data
 
   db2:
     container_name: bookcase_log_db
@@ -78,7 +78,7 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - postgres-db:/var/lib/postgresql/data
+      - postgres-db-log:/var/lib/postgresql/data
   
   pgadmin:
     container_name: pgadmin4_container
@@ -95,7 +95,8 @@ services:
       - pgadmin-data:/var/lib/pgadmin
 
 volumes:
-  postgres-db:
+  postgres-db-main:
+  postgres-db-log:
   pgadmin-data:
 
 networks:
