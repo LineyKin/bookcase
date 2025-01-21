@@ -1,7 +1,6 @@
 package db
 
 import (
-	"bookcase/lib/env"
 	"database/sql"
 	"fmt"
 	"log"
@@ -17,9 +16,9 @@ const DUMP = "internal/db/bookcase_dump.sql"
 
 func InitPostgresDb() (*sql.DB, error) {
 	pgInfo := fmt.Sprintf("host=db1 port=5432 user=%s password=%s dbname=%s sslmode=disable",
-		env.GetPgUser(),
-		env.GetPgPassword(),
-		env.GetPgDbName(),
+		os.Getenv("PG_USER"),
+		os.Getenv("PG_PASSWORD"),
+		os.Getenv("PG_DBNAME"),
 	)
 
 	log.Println("pgInfo: ", pgInfo)
@@ -72,7 +71,7 @@ func checkPgTables(db *sql.DB) bool {
 }
 
 func InitSqliteDB() (*sql.DB, error) {
-	db, err := sql.Open(SQLITE_DRIVER, env.GetDbName())
+	db, err := sql.Open(SQLITE_DRIVER, os.Getenv("SQLITE_DBFILE"))
 	if err != nil {
 		log.Fatal("can't open database:", err)
 		return nil, fmt.Errorf("can't open database: %s", err)

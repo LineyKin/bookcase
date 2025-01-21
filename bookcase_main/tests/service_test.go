@@ -5,10 +5,10 @@ package tests
 import (
 	"bookcase/internal/service"
 	"bookcase/internal/storage/db/sqlite"
-	"bookcase/lib/env"
 	"bookcase/models/author"
 	"database/sql"
 	"log"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,7 +21,7 @@ type IsAuthorExists struct {
 
 // проверка автора на существование в БД
 func TestIsAuthorExists(t *testing.T) {
-	dbsqlite, err := sql.Open("sqlite", "../"+env.GetDbName())
+	dbsqlite, err := sql.Open("sqlite", "../"+os.Getenv("SQLITE_DBFILE"))
 	if err != nil {
 		log.Fatal(err)
 	}

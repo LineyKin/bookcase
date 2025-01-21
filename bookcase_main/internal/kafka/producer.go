@@ -1,8 +1,6 @@
 package kafka
 
 import (
-	"bookcase/lib/env"
-	"fmt"
 	"log"
 	"time"
 
@@ -27,7 +25,7 @@ func ConnectProducer(brokers []string) (sarama.SyncProducer, error) {
 
 func getBrokers() []string {
 	return []string{
-		fmt.Sprintf("kafka:%s", env.GetKafkaPort()),
+		"kafka:9092",
 	}
 }
 

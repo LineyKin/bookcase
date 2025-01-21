@@ -5,9 +5,7 @@ import (
 	"bookcase/internal/kafka"
 	"bookcase/internal/service"
 	"bookcase/internal/storage"
-	"bookcase/lib/env"
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -67,9 +65,8 @@ func New(db *sql.DB, kp *kafka.Producer) (*App, error) {
 }
 
 func (a *App) Run() error {
-	port := env.GetPort()
-	fmt.Printf("http://localhost:%s/\n", port)
-	err := a.gin.Run(":" + port)
+
+	err := a.gin.Run(":1991")
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
