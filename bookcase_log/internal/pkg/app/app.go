@@ -3,6 +3,7 @@ package app
 import (
 	"bookcase_log/internal/handlers"
 	"bookcase_log/internal/kafka/consumer"
+	"bookcase_log/internal/service"
 	"bookcase_log/internal/storage"
 	"database/sql"
 	"fmt"
@@ -15,8 +16,9 @@ import (
 )
 
 type App struct {
-	Storage       *storage.Storage
+	storage       *storage.Storage
 	kafkaConsumer *consumer.KafkaConsumer
+	serv          *service.Service
 	hand          *handlers.Handlers
 
 	gin *gin.Engine
@@ -26,7 +28,10 @@ func New(db *sql.DB) (*App, error) {
 	a := &App{}
 
 	// слой хранилища
-	a.Storage = storage.New(db)
+	a.storage = storage.New(db)
+
+	// слой сервиса
+	a.serv = service.New(a.storage)
 
 	// слой эндпоинтов
 	a.hand = handlers.New()
@@ -51,7 +56,7 @@ func New(db *sql.DB) (*App, error) {
 func (a *App) Run() error {
 
 	if a.kafkaConsumer != nil {
-		go runKafkaConsumer(a.kafkaConsumer)
+		go a.runKafkaConsumer(a.kafkaConsumer)
 	}
 
 	err := a.gin.Run(":1992")
@@ -62,9 +67,7 @@ func (a *App) Run() error {
 	return nil
 }
 
-func runKafkaConsumer(kc *consumer.KafkaConsumer) {
-	msgCnt := 0
-
+func (a *App) runKafkaConsumer(kc *consumer.KafkaConsumer) {
 	consumer, err := kc.Partition()
 	if err != nil {
 		log.Println("kafka partition error: ", err)
@@ -87,10 +90,10 @@ func runKafkaConsumer(kc *consumer.KafkaConsumer) {
 		case err := <-consumer.Errors():
 			fmt.Println(err)
 		case msg := <-consumer.Messages():
-			msgCnt++
-			fmt.Printf("Received order Count %d: | Topic(%s) | Message(%s) \n", msgCnt, string(msg.Topic), string(msg.Value))
+			fmt.Printf("Topic(%s) | Message(%s) \n", string(msg.Topic), string(msg.Value))
 			order := string(msg.Value)
 			fmt.Printf("Добавлен новый автор: %s\n", order)
+			a.serv.AddLog(msg)
 		case <-sigchan:
 			fmt.Println("Interrupt is detected")
 			doneCh <- struct{}{}
@@ -99,7 +102,6 @@ func runKafkaConsumer(kc *consumer.KafkaConsumer) {
 	//}()
 
 	<-doneCh
-	fmt.Println("Processed", msgCnt, "messages")
 
 	// 4. Close the consumer on exit.
 	if err := kc.Close(); err != nil {
