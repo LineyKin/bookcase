@@ -11,6 +11,7 @@ type StorageInterface interface {
 	AddLog(lr models.LogRow) error
 	GetLatestLogTimestamp() time.Time
 	GetLogCount() (int, error)
+	GetLogList(limit, offset int) ([]models.LogRow, error)
 }
 
 type Storage struct {

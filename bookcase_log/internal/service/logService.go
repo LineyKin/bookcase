@@ -20,6 +20,10 @@ func NewService(s storage.StorageInterface) *logService {
 	}
 }
 
+func (s *logService) GetLogList(limit, offset int) ([]models.LogRow, error) {
+	return s.storage.GetLogList(limit, offset)
+}
+
 func (s *logService) GetLogCount() (int, error) {
 	return s.storage.GetLogCount()
 }

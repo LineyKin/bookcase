@@ -3,10 +3,10 @@ package models
 import "time"
 
 type LogRow struct {
-	Producer_ts time.Time
-	Consumer_ts time.Time
-	Topic       string
-	Message     string
+	Producer_ts time.Time `json:"producer_ts"`
+	Consumer_ts time.Time `json:"consumer_ts,omitempty"`
+	Topic       string    `json:"topic,omitempty"`
+	Message     string    `json:"message"`
 }
 
 type Producerdata struct {

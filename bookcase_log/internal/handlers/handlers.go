@@ -9,6 +9,7 @@ import (
 type HandlersInterface interface {
 	GetLogCount(c *gin.Context)
 	FileServer(c *gin.Context)
+	GetLogList(c *gin.Context)
 }
 
 type Handlers struct {

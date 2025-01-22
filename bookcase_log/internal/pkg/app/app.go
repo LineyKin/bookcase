@@ -44,8 +44,11 @@ func New(db *sql.DB) (*App, error) {
 	a.gin.Static("/style", "./web/style")
 	a.gin.Static("/js", "./web/js")
 
-	// ручка для выгрузки количества книг
+	// ручка для выгрузки количества логов
 	a.gin.GET("api/log/count", a.hand.GetLogCount)
+
+	// ручка для выгрузки списка логов
+	a.gin.GET("api/log/list", a.hand.GetLogList)
 
 	// брокер сообщений кафка (получатель)
 	kc, err := consumer.New()
