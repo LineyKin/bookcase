@@ -34,13 +34,18 @@ func New(db *sql.DB) (*App, error) {
 	a.serv = service.New(a.storage)
 
 	// слой эндпоинтов
-	a.hand = handlers.New()
+	a.hand = handlers.New(a.serv)
 
 	// роутер
 	a.gin = gin.Default()
 
 	// ручка для главной страницы
 	a.gin.GET("/", a.hand.FileServer)
+	a.gin.Static("/style", "./web/style")
+	a.gin.Static("/js", "./web/js")
+
+	// ручка для выгрузки количества книг
+	a.gin.GET("api/log/count", a.hand.GetLogCount)
 
 	// брокер сообщений кафка (получатель)
 	kc, err := consumer.New()

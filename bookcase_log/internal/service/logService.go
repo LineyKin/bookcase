@@ -20,6 +20,10 @@ func NewService(s storage.StorageInterface) *logService {
 	}
 }
 
+func (s *logService) GetLogCount() (int, error) {
+	return s.storage.GetLogCount()
+}
+
 func (s *logService) AddLog(msg *sarama.ConsumerMessage, ts time.Time) error {
 
 	var pd models.Producerdata

@@ -9,6 +9,7 @@ import (
 
 type ServiceInterface interface {
 	AddLog(msg *sarama.ConsumerMessage, ts time.Time) error
+	GetLogCount() (int, error)
 }
 
 type Service struct {

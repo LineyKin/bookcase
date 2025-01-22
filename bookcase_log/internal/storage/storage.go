@@ -10,6 +10,7 @@ import (
 type StorageInterface interface {
 	AddLog(lr models.LogRow) error
 	GetLatestLogTimestamp() time.Time
+	GetLogCount() (int, error)
 }
 
 type Storage struct {

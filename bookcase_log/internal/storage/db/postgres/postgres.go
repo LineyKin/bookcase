@@ -19,6 +19,25 @@ func New(db *sql.DB) *PostgresStorage {
 	}
 }
 
+func (s *PostgresStorage) GetLogCount() (int, error) {
+	q := `SELECT COUNT(*) FROM logs`
+	row, err := s.db.Query(q)
+	if err != nil {
+		return 0, err
+	}
+	defer row.Close()
+
+	var count int
+
+	row.Next()
+	err = row.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (s *PostgresStorage) GetLatestLogTimestamp() time.Time {
 	var ts time.Time
 	q := "SELECT MAX(producer_ts) FROM logs"

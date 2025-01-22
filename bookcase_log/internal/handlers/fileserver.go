@@ -9,7 +9,7 @@ import (
 
 const webDir = "web"
 
-func (h *Handlers) FileServer(c *gin.Context) {
+func (ctrl *Controller) FileServer(c *gin.Context) {
 	filePath := filepath.Join(webDir, strings.TrimPrefix(c.Request.URL.Path, "/"))
 	c.File(filePath)
 }
