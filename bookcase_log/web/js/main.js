@@ -1,6 +1,6 @@
 $( document ).ready(function(){
-    console.log("main.js here")
     buildPaginator()
+    getLogList(1)
 });
 
 // количество строк на странице
@@ -8,6 +8,58 @@ const rowsLimit = 10
 
 // количество кнопок пагинатора
 let paginatorItemCount = 0
+
+function getLogList(paginatorNumber) {
+
+    let offset = rowsLimit * (paginatorNumber - 1)
+
+    // Выгрузка списка книг
+    $.ajax({
+        type: "GET",
+        data: {
+            limit: rowsLimit,
+            offset: offset,
+
+        },
+        url: "api/log/list",
+        success: function (response) {
+            buildLogTable(response.log_list)
+        },
+        error: function (errorResponse) {
+            console.log("error")
+            console.log(errorResponse)
+            let status = errorResponse.status + " " + errorResponse.statusText
+            let errorText = errorResponse.responseText
+            let message = "Ошибка выгрузки списка логов. Статус: " + status + ". Ошибка: " + errorText
+            console.log(message)
+            alert(message)
+        }
+    });
+}
+
+function buildLogTable(bookListArray) {
+    $("#logTable .bookRow").remove()
+    len = bookListArray.length
+    for (let i=0; i < len; i++) {
+        let newRow = buildLogRow(bookListArray[i])
+        $("#logTable").append(newRow)
+    }
+}
+
+function dateTimeFormat(ts) {
+    ts = ts.replace("T", ' ')
+    ts = ts.replace("Z", '')
+
+    return ts.split(".")[0]
+}
+
+function buildLogRow(obj) {
+    return `<tr class="bookRow" data-bookId="`+obj.id+`">
+                <td>`+dateTimeFormat(obj.producer_ts)+`</td>
+                <td>`+obj.message+`</td>
+            </tr>`
+}
+
 
 function buildPaginator() {
     let bookCount = getLogCount()
