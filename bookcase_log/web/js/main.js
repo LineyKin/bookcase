@@ -13,7 +13,7 @@ function getLogList(paginatorNumber) {
 
     let offset = rowsLimit * (paginatorNumber - 1)
 
-    // Выгрузка списка книг
+    // Выгрузка списка логов
     $.ajax({
         type: "GET",
         data: {
@@ -38,7 +38,7 @@ function getLogList(paginatorNumber) {
 }
 
 function buildLogTable(bookListArray) {
-    $("#logTable .bookRow").remove()
+    $("#logTable .logRow").remove()
     len = bookListArray.length
     for (let i=0; i < len; i++) {
         let newRow = buildLogRow(bookListArray[i])
@@ -54,7 +54,7 @@ function dateTimeFormat(ts) {
 }
 
 function buildLogRow(obj) {
-    return `<tr class="bookRow" data-bookId="`+obj.id+`">
+    return `<tr class="logRow">
                 <td>`+dateTimeFormat(obj.producer_ts)+`</td>
                 <td>`+obj.message+`</td>
             </tr>`
@@ -62,26 +62,18 @@ function buildLogRow(obj) {
 
 
 function buildPaginator() {
-    let bookCount = getLogCount()
-    let num = bookCount/rowsLimit
+    let logCount = getLogCount()
+    let num = logCount/rowsLimit
     paginatorItemCount = num%10 == 0? num:  Math.trunc(num) + 1
     for (let i=1; i<= paginatorItemCount; i++) {
         let newItem = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>'
-        $("#bookListPagination").append(newItem)
+        $("#logListPagination").append(newItem)
     }
 
-    $("#bookListPagination .page-item").on("click", function(){
+    $("#logListPagination .page-item").on("click", function(){
         let paginatorNumber = $(this).find("a").html()
 
-        let sortedBy, sortType
-        $("#bookListTable th").each(function(){
-            if($(this).attr("isSorted") != undefined) {
-                sortedBy = $(this).attr("name")
-                sortType = $(this).attr("isSorted")
-            }
-        })
-
-        getBookList(paginatorNumber, sortedBy, sortType)
+        getLogList(paginatorNumber)
     })
 }
 
