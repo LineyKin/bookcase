@@ -2,12 +2,13 @@ package service
 
 import (
 	"bookcase_log/internal/storage"
+	"time"
 
 	"github.com/IBM/sarama"
 )
 
 type ServiceInterface interface {
-	AddLog(msg *sarama.ConsumerMessage) error
+	AddLog(msg *sarama.ConsumerMessage, ts time.Time) error
 }
 
 type Service struct {

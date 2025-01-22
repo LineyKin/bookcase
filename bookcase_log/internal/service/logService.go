@@ -20,12 +20,18 @@ func NewService(s storage.StorageInterface) *logService {
 	}
 }
 
-func (s *logService) AddLog(msg *sarama.ConsumerMessage) error {
+func (s *logService) AddLog(msg *sarama.ConsumerMessage, ts time.Time) error {
 
 	var pd models.Producerdata
 	err := json.Unmarshal(msg.Value, &pd)
 	if err != nil {
 		log.Println("service AddLog error: ", err)
+	}
+
+	// защита от дубликатов
+	if ts.Sub(pd.Timestamp).Microseconds() >= 0 {
+		log.Println("duplicated log detected")
+		return nil
 	}
 
 	lr := models.LogRow{

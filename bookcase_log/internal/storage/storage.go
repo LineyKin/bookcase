@@ -4,10 +4,12 @@ import (
 	"bookcase_log/internal/storage/db/postgres"
 	"bookcase_log/models"
 	"database/sql"
+	"time"
 )
 
 type StorageInterface interface {
 	AddLog(lr models.LogRow) error
+	GetLatestLogTimestamp() time.Time
 }
 
 type Storage struct {

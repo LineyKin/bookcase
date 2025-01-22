@@ -4,6 +4,7 @@ import (
 	"bookcase_log/models"
 	"database/sql"
 	"log"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -16,6 +17,18 @@ func New(db *sql.DB) *PostgresStorage {
 	return &PostgresStorage{
 		db: db,
 	}
+}
+
+func (s *PostgresStorage) GetLatestLogTimestamp() time.Time {
+	var ts time.Time
+	q := "SELECT MAX(producer_ts) FROM logs"
+	err := s.db.QueryRow(q).Scan(&ts)
+
+	if err != nil {
+		log.Println("can't get latest timestamp: %w", err)
+	}
+
+	return ts
 }
 
 func (s *PostgresStorage) AddLog(lr models.LogRow) error {

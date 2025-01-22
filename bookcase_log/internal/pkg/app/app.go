@@ -93,7 +93,8 @@ func (a *App) runKafkaConsumer(kc *consumer.KafkaConsumer) {
 			fmt.Printf("Topic(%s) | Message(%s) \n", string(msg.Topic), string(msg.Value))
 			order := string(msg.Value)
 			fmt.Printf("Добавлен новый автор: %s\n", order)
-			a.serv.AddLog(msg)
+			ts := a.storage.GetLatestLogTimestamp()
+			a.serv.AddLog(msg, ts)
 		case <-sigchan:
 			fmt.Println("Interrupt is detected")
 			doneCh <- struct{}{}
