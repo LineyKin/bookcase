@@ -41,7 +41,7 @@ Docker, Docker Compose
 
 ## Запуск приложения
 
-- git clone git@github.com:LineyKin/bookcase.git
+- В терминале запускаем команду git clone git@github.com:LineyKin/bookcase.git
 - В корне проекта создаём .env
 - Заполняем .env как .env.example (по каждому полю есть коммент)
 - В терминале из корня проекта запускаем docker compose up
