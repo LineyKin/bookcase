@@ -22,12 +22,12 @@ Bookcase - веб приложение для личного пользован�
 - Go (gin, sarama, pq)
 - Postgres
 - Kafka
-### frontend
+### frontend:
 - html 
 - css
 - js (jquery)
 - bootstrap
-### окружение
+### окружение:
 Docker, Docker Compose
 
 Всего 7 контейнеров
