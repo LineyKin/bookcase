@@ -1,10 +1,11 @@
 package storage
 
 import (
+	"bookcase/internal/db"
 	"bookcase/internal/storage/db/postgres"
+	"bookcase/internal/storage/db/sqlite"
 	"bookcase/models/author"
 	"bookcase/models/book"
-	"database/sql"
 )
 
 type StorageInterface interface {
@@ -25,8 +26,16 @@ type Storage struct {
 	StorageInterface
 }
 
-func New(db *sql.DB) *Storage {
+func New(db db.AppDB) *Storage {
 	return &Storage{
-		StorageInterface: postgres.New(db),
+		StorageInterface: factory(db),
 	}
+}
+
+func factory(appdb db.AppDB) StorageInterface {
+	if appdb.Driver == db.SQLITE_DRIVER {
+		return sqlite.New(appdb.Connection)
+	}
+
+	return postgres.New(appdb.Connection)
 }

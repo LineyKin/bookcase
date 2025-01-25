@@ -1,11 +1,11 @@
 package app
 
 import (
+	"bookcase/internal/db"
 	"bookcase/internal/handlers"
 	"bookcase/internal/kafka"
 	"bookcase/internal/service"
 	"bookcase/internal/storage"
-	"database/sql"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -20,14 +20,14 @@ type App struct {
 	gin *gin.Engine
 }
 
-func New(db *sql.DB, kp *kafka.Producer) (*App, error) {
+func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	a := &App{}
 
 	// кафка
 	a.kp = kp
 
 	// слой хранилища
-	a.storage = storage.New(db)
+	a.storage = storage.New(appDB)
 
 	// слой сервиса
 	a.serv = service.New(a.storage)

@@ -10,11 +10,11 @@ import (
 func main() {
 
 	// 1. подключение к БД
-	appDB, err := db.InitPostgresDb()
+	appDB, err := db.Init(db.PG_DRIVER) // можно переключиться на sqlite, аргумент db.SQLITE_DRIVER
 	if err != nil {
 		log.Fatal("can't connect to db: ", err)
 	}
-	defer appDB.Close()
+	defer appDB.Connection.Close()
 
 	// 2. кафка (продюсер) для слоя эндпоинтов
 	kp := kafka.NewProducer()

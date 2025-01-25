@@ -4,6 +4,7 @@ import (
 	"bookcase/models/book"
 	"database/sql"
 	"fmt"
+	"log"
 
 	_ "modernc.org/sqlite"
 )
@@ -29,6 +30,7 @@ func getOrderBy(sortedBy, sortType string) string {
 }
 
 func (s *SqliteStorage) GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
+	log.Println("sqlite GetBookList started")
 	q := `
 	SELECT
  		b.id AS id,
@@ -48,11 +50,15 @@ func (s *SqliteStorage) GetBookList(limit, offset int, sortedBy, sortType string
 
 	query := fmt.Sprintf(q, getOrderBy(sortedBy, sortType))
 
+	log.Println(query)
+
 	rows, err := s.db.Query(
 		query,
 		sql.Named("limit", limit),
 		sql.Named("offset", offset),
 	)
+
+	log.Println("sqlite query error:", err)
 
 	if err != nil {
 		return []book.BookUnload{}, err
