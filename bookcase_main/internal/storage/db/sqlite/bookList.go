@@ -30,7 +30,6 @@ func getOrderBy(sortedBy, sortType string) string {
 }
 
 func (s *SqliteStorage) GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
-	log.Println("sqlite GetBookList started")
 	q := `
 	SELECT
  		b.id AS id,
@@ -49,8 +48,6 @@ func (s *SqliteStorage) GetBookList(limit, offset int, sortedBy, sortType string
 	LIMIT :limit OFFSET :offset;`
 
 	query := fmt.Sprintf(q, getOrderBy(sortedBy, sortType))
-
-	log.Println(query)
 
 	rows, err := s.db.Query(
 		query,
