@@ -94,10 +94,25 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
 
+  elasticsearch:
+    image: elasticsearch:7.17.22
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    networks:
+      - kafka-network
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+
 volumes:
   postgres-db-main:
   postgres-db-log:
   pgadmin-data:
+  esdata:
+    driver: local
 
 networks:
   kafka-network:
