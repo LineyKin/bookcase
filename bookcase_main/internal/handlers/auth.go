@@ -5,5 +5,5 @@ import (
 )
 
 func (ctrl *Controller) Register(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "Пользователь заригистрирован"})
+	c.JSON(200, gin.H{"message": "Пользователь зарегистрирован"})
 }
