@@ -40,6 +40,7 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 
 	// ручка для главной страницы
 	a.gin.GET("/", a.hand.FileServer)
+	a.gin.GET("/register", a.hand.FileServer)
 	a.gin.Static("/style", "./web/style")
 	a.gin.Static("/js", "./web/js")
 
