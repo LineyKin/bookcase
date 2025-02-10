@@ -3,6 +3,7 @@ $( document ).ready(function(){
     getPublishingHouseHint()
     buildPaginator()
     getBookList(1, "author", "asc", true)
+    console.log($.cookie())
 });
 
 

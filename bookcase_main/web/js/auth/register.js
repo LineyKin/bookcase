@@ -10,9 +10,8 @@ $("#registerBtn").on("click", function(){
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(registerData),
         success: function (response) {
-            console.log(response.jwt)
-            alert(response.jwt)
-            //window.location.replace("/")
+            $.cookie('bookcase_jwt', response.jwt, { expires: 7, path: '/' });
+            window.location.replace("/")
         },
         error: function (errorResponse) {
             console.log(errorResponse)
