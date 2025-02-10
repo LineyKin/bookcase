@@ -10,8 +10,8 @@ $("#loginBtn").on("click", function(){
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(loginData),
         success: function (response) {
-            console.log(response)
-            //window.location.replace("/")
+            $.cookie('bookcase_jwt', response.jwt, { expires: 7, path: '/' });
+            window.location.replace("/")
         },
         error: function (errorResponse) {
             let status = errorResponse.status + " " + errorResponse.statusText
@@ -22,3 +22,9 @@ $("#loginBtn").on("click", function(){
         }
     });
 })
+
+$("#logoutBtn").on("click", function() {
+    console.log("we here!")
+    $.removeCookie('bookcase_jwt')
+    window.location.replace("/auth")
+});

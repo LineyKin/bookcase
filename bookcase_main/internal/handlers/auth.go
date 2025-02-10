@@ -73,13 +73,17 @@ func (ctrl *Controller) Login(c *gin.Context) {
 	}
 
 	// 2. тут сверяем пароль
-	if user.Password != "111" {
+	if user.Password != authData.CalcPwdHash(authData.Password) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный пароль"})
 		return
-
 	}
 
 	// 3. возвращаем jwt
+	token, err := user.GetJWT()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка создания jwt"})
+		return
+	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Пользователь вошёл"})
+	c.JSON(http.StatusOK, gin.H{"jwt": token})
 }

@@ -28,7 +28,7 @@ func (s *PostgresStorage) GetUserByAuthLogin(a auth.AuthData) (u.User, error) {
 
 	var user u.User
 
-	err := s.db.QueryRow(q, a.Login).Scan(&user)
+	err := s.db.QueryRow(q, a.Login).Scan(&user.Id, &user.Login, &user.Password)
 
 	if err != nil {
 		if err == sql.ErrNoRows {

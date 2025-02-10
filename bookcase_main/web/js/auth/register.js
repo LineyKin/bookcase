@@ -1,3 +1,8 @@
+$( document ).ready(function(){
+    console.log("bookcase_jwt: "+$.cookie("bookcase_jwt"))
+    console.log($.cookie("bookcase_jwt")==null)
+});
+
 $("#registerBtn").on("click", function(){
     let registerData = {
         login: $("#login").val(),

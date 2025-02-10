@@ -7,3 +7,7 @@ type User struct {
 	Jwt string `json:"jwt"`
 	auth.AuthData
 }
+
+func (u User) GetJWT() (string, error) {
+	return u.CalcJWT(u.Id)
+}
