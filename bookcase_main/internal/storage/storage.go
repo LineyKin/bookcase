@@ -4,10 +4,8 @@ import (
 	"bookcase/internal/db"
 	"bookcase/internal/storage/db/postgres"
 	"bookcase/internal/storage/db/sqlite"
-	"bookcase/models/auth"
 	"bookcase/models/author"
 	"bookcase/models/book"
-	u "bookcase/models/user"
 )
 
 type StorageInterface interface {
@@ -22,7 +20,7 @@ type StorageInterface interface {
 	GetBookCount() (int, error)
 	GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
 	GetAuthorByName(a author.Author) ([]int, error)
-	GetUserByAuthLogin(data auth.AuthData) (u.User, error)
+	AuthInterface
 }
 
 type Storage struct {

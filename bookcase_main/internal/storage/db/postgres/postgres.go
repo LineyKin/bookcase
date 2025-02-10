@@ -1,10 +1,8 @@
 package postgres
 
 import (
-	"bookcase/models/auth"
 	"bookcase/models/author"
 	"bookcase/models/book"
-	u "bookcase/models/user"
 	"database/sql"
 	"fmt"
 	"log"
@@ -20,28 +18,6 @@ func New(db *sql.DB) *PostgresStorage {
 	return &PostgresStorage{
 		db: db,
 	}
-}
-
-func (s *PostgresStorage) GetUserByAuthLogin(a auth.AuthData) (u.User, error) {
-	q := `SELECT * FROM users 
-			WHERE login=$1`
-
-	var user u.User
-
-	err := s.db.QueryRow(q,
-		a.Login,
-		a.Password,
-	).Scan(&user)
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return user, nil
-		}
-
-		return user, err
-	}
-
-	return user, nil
 }
 
 func (s *PostgresStorage) GetBookCount() (int, error) {

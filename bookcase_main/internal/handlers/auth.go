@@ -3,6 +3,7 @@ package handlers
 import (
 	"bookcase/models/auth"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +23,7 @@ func (ctrl *Controller) Register(c *gin.Context) {
 	}
 
 	// 1. проверяем, есть ли вообще такой пользователь в базе
-	user, found, err := ctrl.service.Identify(authData)
+	_, found, err := ctrl.service.Identify(authData)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Ошибка идентификации пользователя"})
@@ -34,9 +35,15 @@ func (ctrl *Controller) Register(c *gin.Context) {
 		return
 	}
 
-	_ = user
+	// сохраняем пользователя в систему и получаем jwt
+	jwt, err := ctrl.service.AddNewUser(authData)
+	if err != nil {
+		log.Println("Ошибка добавления нового пользователя", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка добавления нового пользователя"})
+		return
+	}
 
-	c.JSON(201, gin.H{"message": "Пользователь зарегистрирован"})
+	c.JSON(http.StatusCreated, gin.H{"jwt": jwt})
 }
 
 func (ctrl *Controller) Login(c *gin.Context) {

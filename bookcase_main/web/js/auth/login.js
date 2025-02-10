@@ -4,7 +4,6 @@ $("#loginBtn").on("click", function(){
         password: $("#password").val(),
     };
 
-    console.log(loginData)
     $.ajax({
         type: "POST",
         url: "login",

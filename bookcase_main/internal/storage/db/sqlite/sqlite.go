@@ -21,6 +21,11 @@ func New(db *sql.DB) *SqliteStorage {
 	}
 }
 
+func (s *SqliteStorage) AddNewUser(data auth.AuthData) (int, error) {
+	//var u u.User
+	return 0, nil
+}
+
 func (s *SqliteStorage) GetUserByAuthLogin(a auth.AuthData) (u.User, error) {
 	q := `SELECT * FROM users 
 			WHERE login=$1`
