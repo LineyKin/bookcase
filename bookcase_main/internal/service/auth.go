@@ -15,7 +15,7 @@ type AuthInterface interface {
 	AddNewUser(authData auth.AuthData) (userJWT string, err error)
 }
 
-func (s *myLibService) AddNewUser(authData auth.AuthData) (userJWT string, err error) {
+func (s *bookcaseService) AddNewUser(authData auth.AuthData) (userJWT string, err error) {
 	authData.HashPwd()
 	id, err := s.storage.AddNewUser(authData)
 	if err != nil {
@@ -42,7 +42,7 @@ func (s *myLibService) AddNewUser(authData auth.AuthData) (userJWT string, err e
 	return signedToken, nil
 }
 
-func (s *myLibService) Identify(data auth.AuthData) (u.User, bool, error) {
+func (s *bookcaseService) Identify(data auth.AuthData) (u.User, bool, error) {
 	user, err := s.storage.GetUserByAuthLogin(data)
 
 	if err != nil {
