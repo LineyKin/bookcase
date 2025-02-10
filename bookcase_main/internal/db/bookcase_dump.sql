@@ -65,7 +65,6 @@ CREATE TABLE IF NOT EXISTS book (
 
 ALTER SEQUENCE book_id_seq RESTART WITH 20;
 
-
 INSERT INTO "book" ("id", "year_of_publication", "publishing_house_id") VALUES
 	(1, 2023, 1),
 	(2, 2022, 1),
@@ -158,3 +157,10 @@ INSERT INTO "publishing_house" ("id", "name") VALUES
 	(7, 'Научный мир'),
 	(8, 'Астрель'),
 	(9, 'Питер');
+
+/* таблица с пользователями */
+CREATE TABLE IF NOT EXISTS users (
+	id SERIAL PRIMARY KEY,
+	login VARCHAR(256) NOT NULL,
+	password VARCHAR(256) NOT NULL
+);
