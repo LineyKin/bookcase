@@ -44,10 +44,13 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	a.gin.Static("/js", "./web/js")
 
 	// ручка страницы регистрации
-	a.gin.GET("/register", a.hand.FileServer)
+	a.gin.GET("/auth", a.hand.FileServer)
 
 	// ручка регистрации пользователя
 	a.gin.POST("register", a.hand.Register)
+
+	// ручка входа пользователя
+	a.gin.POST("register", a.hand.Login)
 
 	// ручка добавления авторов
 	a.gin.POST("api/author/add", a.hand.AddAuthor)
