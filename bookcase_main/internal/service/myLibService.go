@@ -2,8 +2,10 @@ package service
 
 import (
 	"bookcase/internal/storage"
+	"bookcase/models/auth"
 	"bookcase/models/author"
 	"bookcase/models/book"
+	u "bookcase/models/user"
 	"errors"
 	"fmt"
 )
@@ -141,6 +143,20 @@ func (s *myLibService) AddAuthor(a author.Author) (int, error) {
 	id, err := s.storage.AddAuthor(a)
 	fmt.Println(err)
 	return id, nil
+}
+
+func (s *myLibService) Identify(data auth.AuthData) (u.User, bool, error) {
+	user, err := s.storage.GetUserByAuthLogin(data)
+
+	if err != nil {
+		return user, false, err
+	}
+
+	if user.Id == 0 {
+		return user, false, nil
+	}
+
+	return user, true, nil
 }
 
 // проверяем, не заносили ли мы уже этого автора в БД

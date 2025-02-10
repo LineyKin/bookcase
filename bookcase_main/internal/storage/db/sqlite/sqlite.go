@@ -1,8 +1,10 @@
 package sqlite
 
 import (
+	"bookcase/models/auth"
 	"bookcase/models/author"
 	"bookcase/models/book"
+	u "bookcase/models/user"
 	"database/sql"
 	"fmt"
 
@@ -17,6 +19,23 @@ func New(db *sql.DB) *SqliteStorage {
 	return &SqliteStorage{
 		db: db,
 	}
+}
+
+func (s *SqliteStorage) GetUserByAuthLogin(a auth.AuthData) (u.User, error) {
+	q := `SELECT * FROM users 
+			WHERE login=$1`
+
+	var user u.User
+
+	err := s.db.QueryRow(q,
+		a.Login,
+		a.Password,
+	).Scan(&user)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }
 
 func (s *SqliteStorage) GetBookCount() (int, error) {

@@ -50,7 +50,7 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	a.gin.POST("register", a.hand.Register)
 
 	// ручка входа пользователя
-	a.gin.POST("register", a.hand.Login)
+	a.gin.POST("login", a.hand.Login)
 
 	// ручка добавления авторов
 	a.gin.POST("api/author/add", a.hand.AddAuthor)

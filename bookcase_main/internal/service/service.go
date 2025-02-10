@@ -2,8 +2,10 @@ package service
 
 import (
 	"bookcase/internal/storage"
+	"bookcase/models/auth"
 	"bookcase/models/author"
 	"bookcase/models/book"
+	u "bookcase/models/user"
 )
 
 type ServiceInterface interface {
@@ -14,6 +16,7 @@ type ServiceInterface interface {
 	GetBookCount() (int, error)
 	GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
 	IsAuthorExists(a author.Author) (bool, error)
+	Identify(authData auth.AuthData) (u.User, bool, error)
 }
 
 type Service struct {
