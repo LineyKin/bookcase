@@ -39,6 +39,11 @@ func (ctrl *Controller) AddBook(c *gin.Context) {
 		return
 	}
 
+	if bookData.Jwt == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Пользователь не авторизован"})
+		return
+	}
+
 	b, err := ctrl.service.AddBook(bookData)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

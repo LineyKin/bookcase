@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bookcase/internal/lib/jwtHelper"
 	"bookcase/internal/storage"
 	"bookcase/models/author"
 	"bookcase/models/book"
@@ -41,6 +42,7 @@ func (s *bookcaseService) AddBook(b book.BookAdd) (book.BookAdd, error) {
 	// 3. заполним таблицу book
 	// получим id книги
 	err := s.addPhysicalBook(&b)
+	b.Jwt = ""
 	if err != nil {
 		return b, err
 	}
@@ -107,7 +109,19 @@ func (s *bookcaseService) addLiteraryWork(lw *book.LiteraryWork) error {
 }
 
 func (s *bookcaseService) addPhysicalBook(b *book.BookAdd) error {
-	id, err := s.storage.AddPhysicalBook(b)
+	const WHERE = "service addPhysicalBook():"
+
+	// TODO: распарсить jwt и получить user_id
+	if b.Jwt == "" {
+		return fmt.Errorf("%s пользователь не зарегистрирован", WHERE)
+	}
+
+	userId, err := jwtHelper.GetUserId(b.Jwt)
+	if err != nil {
+		return fmt.Errorf("%s ошибка получения id пользователя", WHERE)
+	}
+
+	id, err := s.storage.AddPhysicalBook(b, userId)
 	if err != nil {
 		return err
 	}

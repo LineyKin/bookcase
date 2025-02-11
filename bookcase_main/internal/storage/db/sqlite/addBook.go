@@ -27,7 +27,7 @@ func (s *SqliteStorage) AddLiteraryWork(lwName string) (int, error) {
 	return int(id), nil
 }
 
-func (s *SqliteStorage) AddPhysicalBook(b *book.BookAdd) (int, error) {
+func (s *SqliteStorage) AddPhysicalBook(b *book.BookAdd, userId interface{}) (int, error) {
 	q := `INSERT INTO book (publishing_house_id, year_of_publication) VALUES(:ph_id, :yop)`
 	res, err := s.db.Exec(
 		q,
