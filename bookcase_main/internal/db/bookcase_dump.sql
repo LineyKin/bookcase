@@ -59,32 +59,33 @@ INSERT INTO "author_and_literary_work" ("author_id", "literary_work_id") VALUES
 
 CREATE TABLE IF NOT EXISTS book (
 		id SERIAL PRIMARY KEY,
+		user_id INTEGER,
 		year_of_publication INTEGER,
 		publishing_house_id INTEGER
 	);
 
 ALTER SEQUENCE book_id_seq RESTART WITH 20;
 
-INSERT INTO "book" ("id", "year_of_publication", "publishing_house_id") VALUES
-	(1, 2023, 1),
-	(2, 2022, 1),
-	(3, 2013, 2),
-	(4, 1980, 3),
-	(5, 2022, 1),
-	(6, 2011, 4),
-	(7, 2019, 2),
-	(8, 2015, 5),
-	(9, 2020, 2),
-	(10, 2018, 2),
-	(11, 2017, 2),
-	(12, 2016, 2),
-	(13, 2016, 2),
-	(14, 2020, 6),
-	(15, 2010, 7),
-	(16, 2022, 1),
-	(17, 2017, 2),
-	(18, 2012, 8),
-	(19, 2024, 9);
+INSERT INTO "book" ("id", "user_id", "year_of_publication", "publishing_house_id") VALUES
+	(1, 1, 2023, 1),
+	(2, 1, 2022, 1),
+	(3, 1, 2013, 2),
+	(4, 1, 1980, 3),
+	(5, 1, 2022, 1),
+	(6, 1, 2011, 4),
+	(7, 1, 2019, 2),
+	(8, 1, 2015, 5),
+	(9, 1, 2020, 2),
+	(10, 1, 2018, 2),
+	(11, 1, 2017, 2),
+	(12, 1, 2016, 2),
+	(13, 1, 2016, 2),
+	(14, 1, 2020, 6),
+	(15, 1, 2010, 7),
+	(16, 1, 2022, 1),
+	(17, 1, 2017, 2),
+	(18, 1, 2012, 8),
+	(19, 1, 2024, 9);
 
 CREATE TABLE IF NOT EXISTS book_and_literary_work (
 		literary_work_id INTEGER,
@@ -164,3 +165,9 @@ CREATE TABLE IF NOT EXISTS users (
 	login VARCHAR(256) NOT NULL,
 	password VARCHAR(256) NOT NULL
 );
+
+ALTER SEQUENCE users_id_seq RESTART WITH 2;
+
+INSERT INTO "users" ("id", "login", "password") 
+VALUES (1, 'Sam', '51b21d529c47d8a88cc39d267fbddd704f19fdb353f5c5b3ca85080c5755715b')
+
