@@ -24,7 +24,6 @@ $("#loginBtn").on("click", function(){
 })
 
 $("#logoutBtn").on("click", function() {
-    console.log("we here!")
     $.removeCookie('bookcase_jwt')
     window.location.replace("/auth")
 });

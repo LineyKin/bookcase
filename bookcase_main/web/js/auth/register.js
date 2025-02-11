@@ -1,6 +1,6 @@
 $( document ).ready(function(){
-    console.log("bookcase_jwt: "+$.cookie("bookcase_jwt"))
-    console.log($.cookie("bookcase_jwt")==null)
+    //console.log("bookcase_jwt: "+$.cookie("bookcase_jwt"))
+    //console.log($.cookie("bookcase_jwt")==null)
 });
 
 $("#registerBtn").on("click", function(){
@@ -19,7 +19,11 @@ $("#registerBtn").on("click", function(){
             window.location.replace("/")
         },
         error: function (errorResponse) {
-            console.log(errorResponse)
+            let status = errorResponse.status + " " + errorResponse.statusText
+            let errorText = errorResponse.responseJSON.error
+            let message = "Ошибка идентификации пользователя: " + status + ". Ошибка: " + errorText
+            console.log(message)
+            alert(errorText)
         }
     });
 })
