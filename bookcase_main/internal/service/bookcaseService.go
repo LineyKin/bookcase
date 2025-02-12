@@ -8,21 +8,21 @@ import (
 	"fmt"
 )
 
-type myLibService struct {
+type bookcaseService struct {
 	storage storage.StorageInterface
 }
 
-func NewService(s storage.StorageInterface) *myLibService {
-	return &myLibService{
+func NewService(s storage.StorageInterface) *bookcaseService {
+	return &bookcaseService{
 		storage: s,
 	}
 }
 
-func (s *myLibService) GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
-	return s.storage.GetBookList(limit, offset, sortedBy, sortType)
+func (s *bookcaseService) GetBookList(userId, limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
+	return s.storage.GetBookList(userId, limit, offset, sortedBy, sortType)
 }
 
-func (s *myLibService) AddBook(b book.BookAdd) (book.BookAdd, error) {
+func (s *bookcaseService) AddBook(b book.BookAdd, userId int) (book.BookAdd, error) {
 	// 1. проверка заполнено ли издательство
 	if b.PublishingHouse.IsEmpty() {
 		return b, errors.New("поле 'Издательство' не заполнено")
@@ -40,7 +40,7 @@ func (s *myLibService) AddBook(b book.BookAdd) (book.BookAdd, error) {
 
 	// 3. заполним таблицу book
 	// получим id книги
-	err := s.addPhysicalBook(&b)
+	err := s.addPhysicalBook(&b, userId)
 	if err != nil {
 		return b, err
 	}
@@ -96,7 +96,7 @@ func (s *myLibService) AddBook(b book.BookAdd) (book.BookAdd, error) {
 	return b, nil
 }
 
-func (s *myLibService) addLiteraryWork(lw *book.LiteraryWork) error {
+func (s *bookcaseService) addLiteraryWork(lw *book.LiteraryWork) error {
 	id, err := s.storage.AddLiteraryWork(lw.Name)
 	if err != nil {
 		return err
@@ -106,8 +106,8 @@ func (s *myLibService) addLiteraryWork(lw *book.LiteraryWork) error {
 	return nil
 }
 
-func (s *myLibService) addPhysicalBook(b *book.BookAdd) error {
-	id, err := s.storage.AddPhysicalBook(b)
+func (s *bookcaseService) addPhysicalBook(b *book.BookAdd, userId int) error {
+	id, err := s.storage.AddPhysicalBook(b, userId)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (s *myLibService) addPhysicalBook(b *book.BookAdd) error {
 	return nil
 }
 
-func (s *myLibService) addPublishingHouse(b *book.BookAdd) error {
+func (s *bookcaseService) addPublishingHouse(b *book.BookAdd) error {
 	id, err := s.storage.AddPublishingHouse(b.PublishingHouse.Name)
 	if err != nil {
 		return err
@@ -126,7 +126,7 @@ func (s *myLibService) addPublishingHouse(b *book.BookAdd) error {
 	return nil
 }
 
-func (s *myLibService) AddAuthor(a author.Author) (int, error) {
+func (s *bookcaseService) AddAuthor(a author.Author) (int, error) {
 
 	isExists, err := s.IsAuthorExists(a)
 	if err != nil {
@@ -145,7 +145,7 @@ func (s *myLibService) AddAuthor(a author.Author) (int, error) {
 
 // проверяем, не заносили ли мы уже этого автора в БД
 // исходим из того, что полные тёски среди авторов редкость
-func (s *myLibService) IsAuthorExists(a author.Author) (bool, error) {
+func (s *bookcaseService) IsAuthorExists(a author.Author) (bool, error) {
 	idList, err := s.storage.GetAuthorByName(a)
 	if err != nil {
 		return false, err
@@ -164,14 +164,14 @@ func (s *myLibService) IsAuthorExists(a author.Author) (bool, error) {
 	return true, fmt.Errorf("обнаружены дубликаты автора %s", a.GetName())
 }
 
-func (s *myLibService) GetAuthorList() ([]author.Author, error) {
+func (s *bookcaseService) GetAuthorList() ([]author.Author, error) {
 	return s.storage.GetAuthorList()
 }
 
-func (s *myLibService) GetPublishingHouseList() ([]book.PublishingHouse, error) {
+func (s *bookcaseService) GetPublishingHouseList() ([]book.PublishingHouse, error) {
 	return s.storage.GetPublishingHouseList()
 }
 
-func (s *myLibService) GetBookCount() (int, error) {
-	return s.storage.GetBookCount()
+func (s *bookcaseService) GetBookCount(userId int) (int, error) {
+	return s.storage.GetBookCount(userId)
 }

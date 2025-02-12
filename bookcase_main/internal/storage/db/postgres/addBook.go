@@ -22,11 +22,12 @@ func (s *PostgresStorage) AddLiteraryWork(lwName string) (int, error) {
 	return id, nil
 }
 
-func (s *PostgresStorage) AddPhysicalBook(b *book.BookAdd) (int, error) {
-	q := `INSERT INTO book (publishing_house_id, year_of_publication) VALUES($1, $2) RETURNING id`
+func (s *PostgresStorage) AddPhysicalBook(b *book.BookAdd, userId interface{}) (int, error) {
+	q := `INSERT INTO book (user_id, publishing_house_id, year_of_publication) VALUES($1, $2, $3) RETURNING id`
 	var id int
 	err := s.db.QueryRow(
 		q,
+		userId,
 		b.PublishingHouse.Id,
 		b.PublishingYear,
 	).Scan(&id)

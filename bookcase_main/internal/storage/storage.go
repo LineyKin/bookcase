@@ -12,14 +12,15 @@ type StorageInterface interface {
 	AddAuthor(a author.Author) (int, error)
 	GetAuthorList() ([]author.Author, error)
 	AddPublishingHouse(phName string) (int, error)
-	AddPhysicalBook(b *book.BookAdd) (int, error)
+	AddPhysicalBook(b *book.BookAdd, userId interface{}) (int, error)
 	AddLiteraryWork(lwName string) (int, error)
 	LinkBookAndLiteraryWork(lwId, bookId int) error
 	LinkAuthorAndLiteraryWork(authorId, bookId int) error
 	GetPublishingHouseList() ([]book.PublishingHouse, error)
-	GetBookCount() (int, error)
-	GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
+	GetBookCount(userId int) (int, error)
+	GetBookList(userId, limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
 	GetAuthorByName(a author.Author) ([]int, error)
+	AuthInterface
 }
 
 type Storage struct {

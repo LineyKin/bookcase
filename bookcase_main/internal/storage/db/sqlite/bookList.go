@@ -29,7 +29,7 @@ func getOrderBy(sortedBy, sortType string) string {
 	}
 }
 
-func (s *SqliteStorage) GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
+func (s *SqliteStorage) GetBookList(userId, limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
 	q := `
 	SELECT
  		b.id AS id,

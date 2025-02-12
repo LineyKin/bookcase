@@ -1,4 +1,9 @@
 $( document ).ready(function(){
+    //console.log("bookcase_jwt: "+$.cookie("bookcase_jwt"))
+    //console.log($.cookie("bookcase_jwt")==null)
+    if($.cookie("bookcase_jwt") == null) {
+        window.location.replace("/auth")
+    }
     getAuthorHint()
     getPublishingHouseHint()
     buildPaginator()
@@ -100,7 +105,8 @@ $("#saveBook").on("click", function(){
         author: authorIdList,
         name: literaryWorkList,
         publishingHouse: publishingHouse,
-        publishingYear: publishingYear
+        publishingYear: publishingYear,
+        jwt: $.cookie("bookcase_jwt")
     }
     $.ajax({
         type: "POST",

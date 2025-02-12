@@ -26,6 +26,23 @@ func NewController(service service.ServiceInterface, kp *kafka.Producer) *Contro
 	}
 }
 
+func getUserId(c *gin.Context) (int, error) {
+	userIdRaw, ok := c.Get(USER_ID_KEY)
+	if !ok {
+		log.Println("no key: ", USER_ID_KEY)
+		return 0, fmt.Errorf("no key: %s", USER_ID_KEY)
+	}
+
+	userId, ok := userIdRaw.(float64)
+	if !ok {
+		return 0, fmt.Errorf("userId не является float64")
+	}
+
+	//userId++
+
+	return int(userId), nil
+}
+
 func (ctrl *Controller) AddBook(c *gin.Context) {
 	if c.Request.Method != http.MethodPost {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
@@ -39,7 +56,12 @@ func (ctrl *Controller) AddBook(c *gin.Context) {
 		return
 	}
 
-	b, err := ctrl.service.AddBook(bookData)
+	userId, err := getUserId(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
+	}
+
+	b, err := ctrl.service.AddBook(bookData, userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -69,7 +91,12 @@ func (ctrl *Controller) GetBookCount(c *gin.Context) {
 		return
 	}
 
-	count, err := ctrl.service.GetBookCount()
+	userId, err := getUserId(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
+	}
+
+	count, err := ctrl.service.GetBookCount(userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -159,7 +186,14 @@ func (ctrl *Controller) GetBookList(c *gin.Context) {
 	sortedBy := c.Query("sortedBy")
 	sortType := c.Query("sortType")
 
-	bookList, err := ctrl.service.GetBookList(limit, offset, sortedBy, sortType)
+	userId, err := getUserId(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
+	}
+
+	//userId++
+
+	bookList, err := ctrl.service.GetBookList(int(userId), limit, offset, sortedBy, sortType)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

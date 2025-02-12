@@ -5,6 +5,7 @@ go 1.23.3
 require (
 	github.com/IBM/sarama v1.44.0
 	github.com/gin-gonic/gin v1.10.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.10.0
 	modernc.org/sqlite v1.34.4
