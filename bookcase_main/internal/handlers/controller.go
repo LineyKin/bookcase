@@ -191,6 +191,8 @@ func (ctrl *Controller) GetBookList(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
 	}
 
+	log.Println("userId we GET", userId)
+
 	//userId++
 
 	bookList, err := ctrl.service.GetBookList(int(userId), limit, offset, sortedBy, sortType)
@@ -202,6 +204,8 @@ func (ctrl *Controller) GetBookList(c *gin.Context) {
 	isAuto := c.Query("isAuto")
 
 	fmt.Println("isAuto:", isAuto)
+
+	log.Println("bookList", bookList)
 
 	c.JSON(http.StatusOK, gin.H{"book_list": bookList})
 }

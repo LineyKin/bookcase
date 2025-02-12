@@ -9,6 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const COOKIE_JWT_AGE = 604800 // 7 дней в секундах
+const HTTP_ONLY = true
+const SECURED = false
+const HOST = "localhost"
+
 func (ctrl *Controller) Register(c *gin.Context) {
 	if c.Request.Method != http.MethodPost {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
@@ -43,7 +48,8 @@ func (ctrl *Controller) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"jwt": jwt})
+	setJWTCookie(c, jwt)
+	c.JSON(http.StatusCreated, gin.H{})
 }
 
 func (ctrl *Controller) Login(c *gin.Context) {
@@ -79,11 +85,16 @@ func (ctrl *Controller) Login(c *gin.Context) {
 	}
 
 	// 3. возвращаем jwt
-	token, err := user.GetJWT()
+	jwt, err := user.GetJWT()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка создания jwt"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"jwt": token})
+	setJWTCookie(c, jwt)
+	c.JSON(http.StatusAccepted, gin.H{})
+}
+
+func setJWTCookie(c *gin.Context, jwt string) {
+	c.SetCookie(COOKIE_JWT_KEY, jwt, COOKIE_JWT_AGE, "/", HOST, SECURED, HTTP_ONLY)
 }

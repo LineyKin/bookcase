@@ -9,8 +9,7 @@ $("#loginBtn").on("click", function(){
         url: "login",
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(loginData),
-        success: function (response) {
-            $.cookie('bookcase_jwt', response.jwt, { expires: 7, path: '/' });
+        success: function () {
             window.location.replace("/")
         },
         error: function (errorResponse) {

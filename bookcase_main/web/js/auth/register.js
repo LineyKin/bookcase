@@ -1,8 +1,3 @@
-$( document ).ready(function(){
-    //console.log("bookcase_jwt: "+$.cookie("bookcase_jwt"))
-    //console.log($.cookie("bookcase_jwt")==null)
-});
-
 $("#registerBtn").on("click", function(){
     let registerData = {
         login: $("#login").val(),
@@ -14,8 +9,7 @@ $("#registerBtn").on("click", function(){
         url: "register",
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(registerData),
-        success: function (response) {
-            $.cookie('bookcase_jwt', response.jwt, { expires: 7, path: '/' });
+        success: function () {
             window.location.replace("/")
         },
         error: function (errorResponse) {
