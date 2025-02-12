@@ -46,6 +46,9 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	// ручка страницы регистрации
 	a.gin.GET("/auth", a.hand.FileServer)
 
+	// ручка страницы общего списка книг
+	a.gin.GET("/total", a.hand.FileServer)
+
 	// ручка регистрации пользователя
 	a.gin.POST("register", a.hand.Register)
 

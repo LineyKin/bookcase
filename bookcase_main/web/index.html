@@ -17,6 +17,7 @@
                 Выйти
             </button>
         </h2>
+        <br>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAuthorModal">
             Добавить автора
         </button>
@@ -24,7 +25,6 @@
             Добавить книгу
         </button>
         <br><br>
-        <h3>Cписок книг</h3>
         <nav>
             <ul id="bookListPagination" class="pagination"></ul>
         </nav>
@@ -43,11 +43,19 @@
         </table>
         <a 
             class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" 
+            href="/total"
+        >
+            Общий книжный шкаф
+        </a> 
+        <br>
+        <a 
+            class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" 
             href="http://localhost:1992/"
             target="_blank"
         >
             Логи
         </a>
+        <br>
     </div>
 
     <!-- Модальное окно добавления автора-->
