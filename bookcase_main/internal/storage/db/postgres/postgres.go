@@ -20,9 +20,9 @@ func New(db *sql.DB) *PostgresStorage {
 	}
 }
 
-func (s *PostgresStorage) GetBookCount() (int, error) {
-	q := `SELECT COUNT(*) FROM book`
-	row, err := s.db.Query(q)
+func (s *PostgresStorage) GetBookCount(userId int) (int, error) {
+	q := `SELECT COUNT(*) FROM book WHERE user_id=$1`
+	row, err := s.db.Query(q, userId)
 	if err != nil {
 		return 0, err
 	}

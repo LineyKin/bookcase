@@ -17,8 +17,8 @@ type StorageInterface interface {
 	LinkBookAndLiteraryWork(lwId, bookId int) error
 	LinkAuthorAndLiteraryWork(authorId, bookId int) error
 	GetPublishingHouseList() ([]book.PublishingHouse, error)
-	GetBookCount() (int, error)
-	GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
+	GetBookCount(userId int) (int, error)
+	GetBookList(userId, limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
 	GetAuthorByName(a author.Author) ([]int, error)
 	AuthInterface
 }

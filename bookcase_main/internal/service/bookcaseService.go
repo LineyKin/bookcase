@@ -18,8 +18,8 @@ func NewService(s storage.StorageInterface) *bookcaseService {
 	}
 }
 
-func (s *bookcaseService) GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
-	return s.storage.GetBookList(limit, offset, sortedBy, sortType)
+func (s *bookcaseService) GetBookList(userId, limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
+	return s.storage.GetBookList(userId, limit, offset, sortedBy, sortType)
 }
 
 func (s *bookcaseService) AddBook(b book.BookAdd, userId int) (book.BookAdd, error) {
@@ -172,6 +172,6 @@ func (s *bookcaseService) GetPublishingHouseList() ([]book.PublishingHouse, erro
 	return s.storage.GetPublishingHouseList()
 }
 
-func (s *bookcaseService) GetBookCount() (int, error) {
-	return s.storage.GetBookCount()
+func (s *bookcaseService) GetBookCount(userId int) (int, error) {
+	return s.storage.GetBookCount(userId)
 }

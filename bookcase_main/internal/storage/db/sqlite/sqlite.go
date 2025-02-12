@@ -43,9 +43,9 @@ func (s *SqliteStorage) GetUserByAuthLogin(a auth.AuthData) (u.User, error) {
 	return user, nil
 }
 
-func (s *SqliteStorage) GetBookCount() (int, error) {
-	q := `SELECT COUNT(*) FROM book`
-	row, err := s.db.Query(q)
+func (s *SqliteStorage) GetBookCount(userId int) (int, error) {
+	q := `SELECT COUNT(*) FROM book WHERE user_id = $1`
+	row, err := s.db.Query(q, userId)
 	if err != nil {
 		return 0, err
 	}

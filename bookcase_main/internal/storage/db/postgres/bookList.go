@@ -27,7 +27,7 @@ func getOrderBy(sortedBy, sortType string) string {
 	}
 }
 
-func (s *PostgresStorage) GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
+func (s *PostgresStorage) GetBookList(userId, limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
 	q := `
 	SELECT 
 		b.id,
@@ -41,6 +41,7 @@ func (s *PostgresStorage) GetBookList(limit, offset int, sortedBy, sortType stri
 	LEFT JOIN literary_work AS lw ON lw.id = blw.literary_work_id
 	LEFT JOIN author_and_literary_work AS alw ON alw.literary_work_id = lw.id
 	LEFT JOIN authors AS a ON a.id = alw.author_id
+	WHERE b.user_id = $3
 	GROUP BY b.id, ph.name
 	ORDER BY %s
 	LIMIT $1 OFFSET $2`
@@ -51,6 +52,7 @@ func (s *PostgresStorage) GetBookList(limit, offset int, sortedBy, sortType stri
 		query,
 		limit,
 		offset,
+		userId,
 	)
 
 	if err != nil {
