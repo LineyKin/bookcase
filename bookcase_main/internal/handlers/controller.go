@@ -39,12 +39,17 @@ func (ctrl *Controller) AddBook(c *gin.Context) {
 		return
 	}
 
-	if bookData.Jwt == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Пользователь не авторизован"})
-		return
+	userIdRaw, ok := c.Get(USER_ID_KEY)
+	if !ok {
+		log.Println("no key: ", USER_ID_KEY)
 	}
 
-	b, err := ctrl.service.AddBook(bookData)
+	userId, ok := userIdRaw.(float64)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "%s userId не является float64"})
+	}
+
+	b, err := ctrl.service.AddBook(bookData, int(userId))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

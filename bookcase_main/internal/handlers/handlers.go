@@ -17,6 +17,7 @@ type HandlersInterface interface {
 	FileServer(c *gin.Context)
 	Register(c *gin.Context)
 	Login(c *gin.Context)
+	AuthMiddleware() gin.HandlerFunc
 }
 
 type Handlers struct {

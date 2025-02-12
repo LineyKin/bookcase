@@ -39,7 +39,7 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	a.gin = gin.Default()
 
 	// ручка для главной страницы
-	a.gin.GET("/", a.hand.FileServer)
+	a.gin.GET("/", a.hand.AuthMiddleware(), a.hand.FileServer)
 	a.gin.Static("/style", "./web/style")
 	a.gin.Static("/js", "./web/js")
 
@@ -65,7 +65,7 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	a.gin.GET("api/book/count", a.hand.GetBookCount)
 
 	// ручка добавления книги
-	a.gin.POST("api/book/add", a.hand.AddBook)
+	a.gin.POST("api/book/add", a.hand.AuthMiddleware(), a.hand.AddBook)
 
 	// ручка выгрузки авторов для подсказки в форме добавления книги
 	a.gin.GET("api/author/hint", a.hand.GetAuthorList)

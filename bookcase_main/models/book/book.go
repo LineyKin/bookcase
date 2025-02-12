@@ -11,7 +11,6 @@ type BookAdd struct {
 	Name            []LiteraryWork  `json:"name"`
 	Author          []int           `json:"author"`
 	PublishingHouse PublishingHouse `json:"publishingHouse"`
-	Jwt             string          `json:"jwt"`
 }
 
 // формат чтения из списка

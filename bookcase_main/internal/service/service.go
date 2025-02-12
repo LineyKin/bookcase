@@ -9,7 +9,7 @@ import (
 type ServiceInterface interface {
 	AddAuthor(a author.Author) (int, error)
 	GetAuthorList() ([]author.Author, error)
-	AddBook(b book.BookAdd) (book.BookAdd, error)
+	AddBook(b book.BookAdd, userId int) (book.BookAdd, error)
 	GetPublishingHouseList() ([]book.PublishingHouse, error)
 	GetBookCount() (int, error)
 	GetBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)

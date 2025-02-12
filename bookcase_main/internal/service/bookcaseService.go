@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bookcase/internal/lib/jwtHelper"
 	"bookcase/internal/storage"
 	"bookcase/models/author"
 	"bookcase/models/book"
@@ -23,7 +22,7 @@ func (s *bookcaseService) GetBookList(limit, offset int, sortedBy, sortType stri
 	return s.storage.GetBookList(limit, offset, sortedBy, sortType)
 }
 
-func (s *bookcaseService) AddBook(b book.BookAdd) (book.BookAdd, error) {
+func (s *bookcaseService) AddBook(b book.BookAdd, userId int) (book.BookAdd, error) {
 	// 1. проверка заполнено ли издательство
 	if b.PublishingHouse.IsEmpty() {
 		return b, errors.New("поле 'Издательство' не заполнено")
@@ -41,8 +40,7 @@ func (s *bookcaseService) AddBook(b book.BookAdd) (book.BookAdd, error) {
 
 	// 3. заполним таблицу book
 	// получим id книги
-	err := s.addPhysicalBook(&b)
-	b.Jwt = ""
+	err := s.addPhysicalBook(&b, userId)
 	if err != nil {
 		return b, err
 	}
@@ -108,19 +106,7 @@ func (s *bookcaseService) addLiteraryWork(lw *book.LiteraryWork) error {
 	return nil
 }
 
-func (s *bookcaseService) addPhysicalBook(b *book.BookAdd) error {
-	const WHERE = "service addPhysicalBook():"
-
-	// TODO: распарсить jwt и получить user_id
-	if b.Jwt == "" {
-		return fmt.Errorf("%s пользователь не зарегистрирован", WHERE)
-	}
-
-	userId, err := jwtHelper.GetUserId(b.Jwt)
-	if err != nil {
-		return fmt.Errorf("%s ошибка получения id пользователя", WHERE)
-	}
-
+func (s *bookcaseService) addPhysicalBook(b *book.BookAdd, userId int) error {
 	id, err := s.storage.AddPhysicalBook(b, userId)
 	if err != nil {
 		return err
