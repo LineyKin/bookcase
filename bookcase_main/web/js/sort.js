@@ -24,7 +24,12 @@ $("#bookListTable th").on("click", function(){
         }
     }
 
-    getBookList(1, $(this).attr("name"), $(this).attr("isSorted"))
+    isTotal = 0
+    if ($("#bookListTable").attr("class") == "table table-striped total") {
+        isTotal = 1
+    }
+
+    getBookList(1, $(this).attr("name"), $(this).attr("isSorted"), isTotal)
 })
 
 

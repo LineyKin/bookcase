@@ -2,3 +2,8 @@
     cursor: pointer;
     width: 25%;
 }
+
+.total th {
+    cursor: pointer;
+    width: 20% !important;
+}

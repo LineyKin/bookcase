@@ -158,4 +158,13 @@
     <script src="js/bookList.js" ></script>
     <script src="js/sort.js" ></script>
     <script src="js/auth/login.js" ></script>
+    <script>
+        $( document ).ready(function(){
+            getAuthorHint()
+            getPublishingHouseHint()
+            let isTotal = 0
+            buildPaginator(isTotal)
+            getBookList(1, "author", "asc", isTotal)
+        });
+    </script>
 </html>

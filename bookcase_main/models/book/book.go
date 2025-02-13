@@ -19,6 +19,7 @@ type BookUnload struct {
 	Name            string `json:"name"`
 	Author          string `json:"author"`
 	PublishingHouse string `json:"publishingHouse"`
+	User            string `json:"user"`
 }
 
 type ListParam struct {

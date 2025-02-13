@@ -185,6 +185,7 @@ func (ctrl *Controller) GetBookList(c *gin.Context) {
 
 	sortedBy := c.Query("sortedBy")
 	sortType := c.Query("sortType")
+	isTotal := c.Query("isTotal")
 
 	userId, err := getUserId(c)
 	if err != nil {
@@ -192,7 +193,12 @@ func (ctrl *Controller) GetBookList(c *gin.Context) {
 		return
 	}
 
-	bookList, err := ctrl.service.GetBookList(userId, limit, offset, sortedBy, sortType)
+	isTotalBool := false
+	if isTotal == "1" {
+		isTotalBool = true
+	}
+
+	bookList, err := ctrl.service.GetBookList(userId, limit, offset, sortedBy, sortType, isTotalBool)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

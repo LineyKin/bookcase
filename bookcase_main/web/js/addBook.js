@@ -1,11 +1,3 @@
-$( document ).ready(function(){
-    getAuthorHint()
-    getPublishingHouseHint()
-    buildPaginator()
-    getBookList(1, "author", "asc", true)
-});
-
-
 function createOptionForDatalist(id, name) {
     return '<option name="'+name+'" data-id="'+id+'">'+name+'</option>';
 }

@@ -3,8 +3,9 @@ const rowsLimit = 10
 
 // количество кнопок пагинатора
 let paginatorItemCount = 0
+let isTotalGlobal;
 
-function buildPaginator() {
+function buildPaginator(isTotal) {
     let bookCount = getBookCount()
     let num = bookCount/rowsLimit
     paginatorItemCount = num - Math.trunc(num) == 0? num:  Math.trunc(num) + 1
@@ -24,12 +25,12 @@ function buildPaginator() {
             }
         })
 
-        getBookList(paginatorNumber, sortedBy, sortType)
+        getBookList(paginatorNumber, sortedBy, sortType, isTotal)
     })
 }
 
-function getBookList(paginatorNumber, sortedBy, sortType) {
-
+function getBookList(paginatorNumber, sortedBy, sortType, isTotal) {
+    isTotalGlobal = isTotal
     let offset = rowsLimit * (paginatorNumber - 1)
 
     // Выгрузка списка книг
@@ -40,6 +41,7 @@ function getBookList(paginatorNumber, sortedBy, sortType) {
             offset: offset,
             sortedBy: sortedBy,
             sortType: sortType,
+            isTotal: isTotal
         },
         url: "api/book/list",
         success: function (response) {
@@ -67,6 +69,15 @@ function buildBookTable(bookListArray) {
 }
 
 function buildBookRow(obj) {
+    if (isTotalGlobal == 1) {
+        return `<tr class="bookRow" data-bookId="`+obj.id+`">
+                <td>`+obj.user+`</td>
+                <td>`+obj.author+`</td>
+                <td>`+obj.name+`</td>
+                <td>`+obj.publishingHouse+`</td>
+                <td>`+obj.publishingYear+`</td>
+            </tr>`
+    }
     return `<tr class="bookRow" data-bookId="`+obj.id+`">
                 <td>`+obj.author+`</td>
                 <td>`+obj.name+`</td>

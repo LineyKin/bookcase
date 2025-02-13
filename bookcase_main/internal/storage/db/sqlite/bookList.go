@@ -76,3 +76,7 @@ func (s *SqliteStorage) GetBookList(userId, limit, offset int, sortedBy, sortTyp
 
 	return list, nil
 }
+
+func (s *SqliteStorage) GetTotalBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
+	return []book.BookUnload{}, nil
+}

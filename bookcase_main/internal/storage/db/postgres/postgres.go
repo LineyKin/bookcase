@@ -21,8 +21,10 @@ func New(db *sql.DB) *PostgresStorage {
 }
 
 func (s *PostgresStorage) GetBookCount(userId int) (int, error) {
-	q := `SELECT COUNT(*) FROM book WHERE user_id=$1`
-	row, err := s.db.Query(q, userId)
+	// TODO: отрефакторить архитектуру общего списка книг
+	//q := `SELECT COUNT(*) FROM book WHERE user_id=$1`
+	q := `SELECT COUNT(*) FROM book`
+	row, err := s.db.Query(q)
 	if err != nil {
 		return 0, err
 	}

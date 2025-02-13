@@ -19,6 +19,7 @@ type StorageInterface interface {
 	GetPublishingHouseList() ([]book.PublishingHouse, error)
 	GetBookCount(userId int) (int, error)
 	GetBookList(userId, limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
+	GetTotalBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
 	GetAuthorByName(a author.Author) ([]int, error)
 	AuthInterface
 }
