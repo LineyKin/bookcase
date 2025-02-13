@@ -84,27 +84,6 @@ func (ctrl *Controller) GetPublishingHouseList(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ph_list": ph})
 }
 
-func (ctrl *Controller) GetBookCount(c *gin.Context) {
-	if c.Request.Method != http.MethodGet {
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
-		return
-	}
-
-	userId, err := getUserId(c)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
-		return
-	}
-
-	count, err := ctrl.service.GetBookCount(userId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"count": count})
-}
-
 func (ctrl *Controller) GetAuthorList(c *gin.Context) {
 	if c.Request.Method != http.MethodGet {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
@@ -163,6 +142,42 @@ func (ctrl *Controller) AddAuthor(c *gin.Context) {
 	}
 }
 
+func (ctrl *Controller) GetBookCount(c *gin.Context) {
+	if c.Request.Method != http.MethodGet {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
+		return
+	}
+
+	userId, err := getUserId(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
+		return
+	}
+
+	count, err := ctrl.service.GetBookCount(userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
+func (ctrl *Controller) GetBookCountTotal(c *gin.Context) {
+	if c.Request.Method != http.MethodGet {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
+		return
+	}
+
+	count, err := ctrl.service.GetBookCountTotal()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"count_total": count})
+}
+
 func (ctrl *Controller) GetBookList(c *gin.Context) {
 	if c.Request.Method != http.MethodGet {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
@@ -185,7 +200,6 @@ func (ctrl *Controller) GetBookList(c *gin.Context) {
 
 	sortedBy := c.Query("sortedBy")
 	sortType := c.Query("sortType")
-	isTotal := c.Query("isTotal")
 
 	userId, err := getUserId(c)
 	if err != nil {
@@ -193,16 +207,43 @@ func (ctrl *Controller) GetBookList(c *gin.Context) {
 		return
 	}
 
-	isTotalBool := false
-	if isTotal == "1" {
-		isTotalBool = true
-	}
-
-	bookList, err := ctrl.service.GetBookList(userId, limit, offset, sortedBy, sortType, isTotalBool)
+	bookList, err := ctrl.service.GetBookList(userId, limit, offset, sortedBy, sortType)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"book_list": bookList})
+}
+
+func (ctrl *Controller) GetBookListTotal(c *gin.Context) {
+	if c.Request.Method != http.MethodGet {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
+		return
+	}
+
+	limitString := c.Query("limit")
+	limit, err := strconv.Atoi(limitString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	offsetString := c.Query("offset")
+	offset, err := strconv.Atoi(offsetString)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	sortedBy := c.Query("sortedBy")
+	sortType := c.Query("sortType")
+
+	bookList, err := ctrl.service.GetBookListTotal(limit, offset, sortedBy, sortType)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"book_list_total": bookList})
 }

@@ -81,7 +81,7 @@ func (s *PostgresStorage) GetBookList(userId, limit, offset int, sortedBy, sortT
 	return list, nil
 }
 
-func (s *PostgresStorage) GetTotalBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
+func (s *PostgresStorage) GetBookListTotal(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
 	q := `
 	SELECT 
 		b.id,
