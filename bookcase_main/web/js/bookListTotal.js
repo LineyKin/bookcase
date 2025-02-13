@@ -29,8 +29,7 @@ function buildPaginator(isTotal) {
     })
 }
 
-function getBookList(paginatorNumber, sortedBy, sortType, isTotal) {
-    isTotalGlobal = isTotal
+function getBookList(paginatorNumber, sortedBy, sortType) {
     let offset = rowsLimit * (paginatorNumber - 1)
 
     // Выгрузка списка книг
@@ -41,7 +40,6 @@ function getBookList(paginatorNumber, sortedBy, sortType, isTotal) {
             offset: offset,
             sortedBy: sortedBy,
             sortType: sortType,
-            isTotal: isTotal
         },
         url: "api/book/list",
         success: function (response) {
@@ -69,21 +67,14 @@ function buildBookTable(bookListArray) {
 }
 
 function buildBookRow(obj) {
-    if (isTotalGlobal == 1) {
-        return `<tr class="bookRow" data-bookId="`+obj.id+`">
-                <td>`+obj.user+`</td>
-                <td>`+obj.author+`</td>
-                <td>`+obj.name+`</td>
-                <td>`+obj.publishingHouse+`</td>
-                <td>`+obj.publishingYear+`</td>
-            </tr>`
-    }
     return `<tr class="bookRow" data-bookId="`+obj.id+`">
-                <td>`+obj.author+`</td>
-                <td>`+obj.name+`</td>
-                <td>`+obj.publishingHouse+`</td>
-                <td>`+obj.publishingYear+`</td>
-            </tr>`
+            <td>`+obj.user+`</td>
+            <td>`+obj.author+`</td>
+            <td>`+obj.name+`</td>
+            <td>`+obj.publishingHouse+`</td>
+            <td>`+obj.publishingYear+`</td>
+        </tr>`
+
 }
 
 function getBookCount() {
@@ -94,8 +85,7 @@ function getBookCount() {
         url: "api/book/count/total",
         contentType: 'application/json; charset=utf-8',
         success: function (response) {
-            count = response.count
-
+            count = response.count_total
         },
         error: function (errorResponse) {
             let status = errorResponse.status + " " + errorResponse.statusText

@@ -12,6 +12,7 @@ type ServiceInterface interface {
 	AddBook(b book.BookAdd, userId int) (book.BookAdd, error)
 	GetPublishingHouseList() ([]book.PublishingHouse, error)
 	GetBookCount(userId int) (int, error)
+	GetBookCountTotal() (int, error)
 	GetBookList(userId, limit, offset int, sortedBy, sortType string, isTotal bool) ([]book.BookUnload, error)
 	IsAuthorExists(a author.Author) (bool, error)
 	AuthInterface

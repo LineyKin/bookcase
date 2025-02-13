@@ -179,3 +179,7 @@ func (s *bookcaseService) GetPublishingHouseList() ([]book.PublishingHouse, erro
 func (s *bookcaseService) GetBookCount(userId int) (int, error) {
 	return s.storage.GetBookCount(userId)
 }
+
+func (s *bookcaseService) GetBookCountTotal() (int, error) {
+	return s.storage.GetBookCountTotal()
+}

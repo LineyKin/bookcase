@@ -105,6 +105,21 @@ func (ctrl *Controller) GetBookCount(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"count": count})
 }
 
+func (ctrl *Controller) GetBookCountTotal(c *gin.Context) {
+	if c.Request.Method != http.MethodGet {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
+		return
+	}
+
+	count, err := ctrl.service.GetBookCountTotal()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"count_total": count})
+}
+
 func (ctrl *Controller) GetAuthorList(c *gin.Context) {
 	if c.Request.Method != http.MethodGet {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
