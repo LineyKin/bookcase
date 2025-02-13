@@ -15,6 +15,7 @@ type HandlersInterface interface {
 	GetBookCount(c *gin.Context)
 	GetBookCountTotal(c *gin.Context)
 	GetBookList(c *gin.Context)
+	GetBookListTotal(c *gin.Context)
 	FileServer(c *gin.Context)
 	Register(c *gin.Context)
 	Login(c *gin.Context)

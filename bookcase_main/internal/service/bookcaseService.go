@@ -18,11 +18,11 @@ func NewService(s storage.StorageInterface) *bookcaseService {
 	}
 }
 
-func (s *bookcaseService) GetBookList(userId, limit, offset int, sortedBy, sortType string, isTotal bool) ([]book.BookUnload, error) {
-	if isTotal {
-		return s.storage.GetTotalBookList(limit, offset, sortedBy, sortType)
-	}
+func (s *bookcaseService) GetBookListTotal(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
+	return s.storage.GetBookListTotal(limit, offset, sortedBy, sortType)
+}
 
+func (s *bookcaseService) GetBookList(userId, limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
 	return s.storage.GetBookList(userId, limit, offset, sortedBy, sortType)
 }
 

@@ -19,7 +19,7 @@ type StorageInterface interface {
 	GetBookCount(userId int) (int, error)
 	GetBookCountTotal() (int, error)
 	GetBookList(userId, limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
-	GetTotalBookList(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
+	GetBookListTotal(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
 	GetAuthorByName(a author.Author) ([]int, error)
 	AuthInterface
 }

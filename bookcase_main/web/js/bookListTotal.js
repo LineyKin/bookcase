@@ -41,9 +41,9 @@ function getBookList(paginatorNumber, sortedBy, sortType) {
             sortedBy: sortedBy,
             sortType: sortType,
         },
-        url: "api/book/list",
+        url: "api/book/list/total",
         success: function (response) {
-            buildBookTable(response.book_list)
+            buildBookTable(response.book_list_total)
         },
         error: function (errorResponse) {
             console.log("error")

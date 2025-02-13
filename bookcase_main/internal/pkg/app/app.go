@@ -59,8 +59,11 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	// ручка добавления авторов
 	a.gin.POST("api/author/add", a.hand.AuthMiddleware(), a.hand.AddAuthor)
 
-	// ручка для выгрузки списка книг
+	// ручка для выгрузки списка книг пользователя
 	a.gin.GET("api/book/list", a.hand.AuthMiddleware(), a.hand.GetBookList)
+
+	// ручка для выгрузки списка книг пользователя
+	a.gin.GET("api/book/list/total", a.hand.AuthMiddleware(), a.hand.GetBookListTotal)
 
 	// ручка для выгрузки количества книг пользователя
 	a.gin.GET("api/book/count", a.hand.AuthMiddleware(), a.hand.GetBookCount)

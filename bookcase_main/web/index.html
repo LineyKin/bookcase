@@ -162,9 +162,8 @@
         $( document ).ready(function(){
             getAuthorHint()
             getPublishingHouseHint()
-            let isTotal = 0
-            buildPaginator(isTotal)
-            getBookList(1, "author", "asc", isTotal)
+            buildPaginator()
+            getBookList(1, "author", "asc")
         });
     </script>
 </html>
