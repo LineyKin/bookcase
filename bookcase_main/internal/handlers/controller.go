@@ -38,8 +38,6 @@ func getUserId(c *gin.Context) (int, error) {
 		return 0, fmt.Errorf("userId не является float64")
 	}
 
-	//userId++
-
 	return int(userId), nil
 }
 
@@ -59,6 +57,7 @@ func (ctrl *Controller) AddBook(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
+		return
 	}
 
 	b, err := ctrl.service.AddBook(bookData, userId)
@@ -94,6 +93,7 @@ func (ctrl *Controller) GetBookCount(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
+		return
 	}
 
 	count, err := ctrl.service.GetBookCount(userId)
@@ -189,23 +189,14 @@ func (ctrl *Controller) GetBookList(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
+		return
 	}
 
-	log.Println("userId we GET", userId)
-
-	//userId++
-
-	bookList, err := ctrl.service.GetBookList(int(userId), limit, offset, sortedBy, sortType)
+	bookList, err := ctrl.service.GetBookList(userId, limit, offset, sortedBy, sortType)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	isAuto := c.Query("isAuto")
-
-	fmt.Println("isAuto:", isAuto)
-
-	log.Println("bookList", bookList)
 
 	c.JSON(http.StatusOK, gin.H{"book_list": bookList})
 }

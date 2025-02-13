@@ -3,7 +3,6 @@ package handlers
 import (
 	"bookcase/internal/lib/jwtHelper"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -31,7 +30,6 @@ func (ctrl *Controller) AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		log.Println("userId we set", userId)
 		c.Set(USER_ID_KEY, userId)
 		c.Next()
 	}
