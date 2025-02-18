@@ -5,7 +5,10 @@ import (
 	u "bookcase/models/user"
 	"database/sql"
 	"fmt"
+	"log"
 )
+
+const DUPLICATE_ERROR = `pq: duplicate key value violates unique constraint "idx_login_unique"`
 
 func (s *PostgresStorage) AddNewUser(data auth.AuthData) (int, error) {
 	q := `INSERT INTO users (login, password) VALUES($1, $2) RETURNING id`
@@ -17,7 +20,13 @@ func (s *PostgresStorage) AddNewUser(data auth.AuthData) (int, error) {
 	).Scan(&id)
 
 	if err != nil {
-		return id, fmt.Errorf("can't add new user: %w", err)
+		log.Printf("can't add new user: %s", err)
+
+		if err.Error() == DUPLICATE_ERROR {
+			return 0, fmt.Errorf("пользователь с логином %s уже существует", data.Login)
+		}
+
+		return id, err
 	}
 
 	return id, nil

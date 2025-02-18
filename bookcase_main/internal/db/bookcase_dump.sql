@@ -167,6 +167,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 ALTER SEQUENCE users_id_seq RESTART WITH 2;
+CREATE UNIQUE INDEX idx_login_unique ON users (login);
 
 INSERT INTO "users" ("id", "login", "password") 
 VALUES (1, 'Sam', '51b21d529c47d8a88cc39d267fbddd704f19fdb353f5c5b3ca85080c5755715b')

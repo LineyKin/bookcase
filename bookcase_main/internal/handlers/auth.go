@@ -27,24 +27,13 @@ func (ctrl *Controller) Register(c *gin.Context) {
 		return
 	}
 
-	// 1. проверяем, есть ли вообще такой пользователь в базе
-	_, found, err := ctrl.service.Identify(authData)
-	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Ошибка идентификации пользователя"})
-		return
-	}
-
-	if found {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Пользователь с таким логином уже существует"})
-		return
-	}
-
 	// сохраняем пользователя в систему и получаем jwt
+	// если пользователь с таким логином существует - вернётся соответствующая ошибка
 	jwt, err := ctrl.service.AddNewUser(authData)
 	if err != nil {
 		log.Println("Ошибка добавления нового пользователя", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка добавления нового пользователя"})
+
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Ошибка добавления нового пользователя: %s", err)})
 		return
 	}
 
