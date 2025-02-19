@@ -4,6 +4,7 @@ import (
 	"bookcase/internal/lib/jwtHelper"
 	"bookcase/models"
 	"bookcase/models/author"
+	"bookcase/models/book"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -40,6 +41,10 @@ func getObjectByPath(c *gin.Context) models.UserLogInterface {
 		var author author.Author
 		err = c.BindJSON(&author)
 		return author
+	case ADD_BOOK_URL:
+		var book book.BookAdd
+		err = c.BindJSON(&book)
+		return book
 	default:
 		return nil
 	}

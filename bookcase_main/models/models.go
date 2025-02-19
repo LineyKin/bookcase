@@ -13,3 +13,10 @@ type UserLog struct {
 	Message   string    `json:"message"`
 	Timestamp time.Time `json:"timestamp"`
 }
+
+func NewUserLog() UserLog {
+	var ul UserLog
+	ul.Timestamp = time.Now()
+
+	return ul
+}
