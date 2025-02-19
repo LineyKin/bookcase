@@ -87,10 +87,11 @@ func (s *PostgresStorage) GetLatestLogTimestamp() time.Time {
 }
 
 func (s *PostgresStorage) AddLog(lr models.LogRow) error {
-	q := `INSERT INTO logs (producer_ts, consumer_ts, topic, message) VALUES($1, $2, $3, $4)`
+	q := `INSERT INTO logs (user_id, producer_ts, consumer_ts, topic, message) VALUES($1, $2, $3, $4, $5)`
 
 	err := s.db.QueryRow(
 		q,
+		lr.Id,
 		lr.Producer_ts,
 		lr.Consumer_ts,
 		lr.Topic,

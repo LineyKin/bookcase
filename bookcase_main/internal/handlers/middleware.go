@@ -2,7 +2,13 @@ package handlers
 
 import (
 	"bookcase/internal/lib/jwtHelper"
+	"bookcase/models"
+	"bookcase/models/author"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,6 +16,82 @@ import (
 
 const COOKIE_JWT_KEY = "bookcase_jwt"
 const USER_ID_KEY = "user_id"
+
+type Middleware interface {
+	AuthMiddleware() gin.HandlerFunc
+	LogToKafkaMiddleware() gin.HandlerFunc
+}
+
+func getObjectByPath(c *gin.Context) models.UserLogInterface {
+	var err error
+
+	defer func() {
+		if err != nil {
+			errOutput := fmt.Errorf("ошибка десериализации JSON во время логирования: %s", err)
+			log.Println(errOutput)
+			c.JSON(http.StatusBadRequest, gin.H{"error": errOutput})
+			c.Abort()
+			return
+		}
+	}()
+
+	switch c.Request.URL.Path {
+	case ADD_AUTHOR_URL:
+		var author author.Author
+		err = c.BindJSON(&author)
+		return author
+	default:
+		return nil
+	}
+}
+
+func (ctrl *Controller) LogToKafkaMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// копируем тело запроса
+		body, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+			return
+		}
+
+		// Возвращаем в контекст.
+		// Оно у нас опустошилось после копирования.
+		c.Request.Body = io.NopCloser(bytes.NewReader(body))
+
+		userLog := getObjectByPath(c).NewLog()
+		userId, _ := getUserId(c)
+		userLog.Id = userId
+
+		// если продюсер кафки не активен, завершаем хэндлер
+		if ctrl.kp == nil {
+			log.Println("лог не передан в кафку из-за её неактивности")
+			c.Next()
+			return
+		}
+
+		// data for kafka
+		logInBytes, err := json.Marshal(userLog)
+		if err != nil {
+			log.Println("can't prepare data for kafka: ", err)
+			c.Abort()
+			return
+		}
+
+		// Send the bytes to kafka
+		err = ctrl.kp.PushLogToQueue("bookcase_log", logInBytes)
+		if err != nil {
+			log.Println("can't send data to kafka: ", err)
+			c.Abort()
+			return
+		}
+
+		// Снова возвращаем тело в контекст.
+		// Оно у нас опустошилось после чтения в getObjectByPath()
+		c.Request.Body = io.NopCloser(bytes.NewReader(body))
+		c.Next()
+	}
+}
 
 // Middleware для проверки JWT
 func (ctrl *Controller) AuthMiddleware() gin.HandlerFunc {

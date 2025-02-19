@@ -5,7 +5,6 @@ import (
 	"bookcase/internal/service"
 	"bookcase/models/author"
 	"bookcase/models/book"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -108,7 +107,7 @@ func (ctrl *Controller) AddAuthor(c *gin.Context) {
 
 	var author author.Author
 	if err := c.BindJSON(&author); err != nil {
-		fmt.Println(err)
+		fmt.Println("handler AddAuthor", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Ошибка десериализации JSON"})
 		return
 	}
@@ -122,24 +121,6 @@ func (ctrl *Controller) AddAuthor(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"author_id": id})
 
-	// если продюсер кафки не активен, завершаем хэндлер
-	if ctrl.kp == nil {
-		log.Println("лог добавления автора не передан в кафку из-за её неактивности")
-		return
-	}
-
-	// data for kafka
-	author.Id = id
-	authorInBytes, err := json.Marshal(author.NewLog())
-	if err != nil {
-		log.Println("can't prepare data for kafka: ", err)
-	}
-
-	// Send the bytes to kafka
-	err = ctrl.kp.PushLogToQueue("bookcase_log", authorInBytes)
-	if err != nil {
-		log.Println("can't send data to kafka: ", err)
-	}
 }
 
 func (ctrl *Controller) GetBookCount(c *gin.Context) {
