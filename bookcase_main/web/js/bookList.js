@@ -6,7 +6,6 @@ let paginatorItemCount = 0
 
 function buildPaginator() {
     let bookCount = getBookCount()
-    console.log("bookCount "+bookCount)
     let num = bookCount/rowsLimit
     paginatorItemCount = num - Math.trunc(num) == 0? num:  Math.trunc(num) + 1
     for (let i=1; i<= paginatorItemCount; i++) {
