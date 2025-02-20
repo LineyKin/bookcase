@@ -29,7 +29,7 @@ func (ctrl *Controller) LogMW() gin.HandlerFunc {
 			return
 		}
 
-		userId, _ := getUserId(c)
+		userId, err := getUserId(c)
 		if err != nil {
 			log.Println("ошибка получения id пользователя из контекста в LogMW()", err)
 			c.Abort()
@@ -91,8 +91,6 @@ func (ctrl *Controller) AuthMW() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
-		log.Println("jwtHelper userInfo", userInfo)
 
 		c.Set(USER_ID_KEY, userInfo[jwtHelper.USER_ID_INDEX])
 		c.Set(LOGIN_KEY, userInfo[jwtHelper.USER_LOGIN_INDEX])

@@ -64,10 +64,9 @@ func (ctrl *Controller) AddBook(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Set(USER_LOG_KEY, b.NewLog())
 
 	c.JSON(http.StatusOK, gin.H{"new_book": b})
-
+	c.Set(USER_LOG_KEY, b.NewLog())
 	c.Next()
 }
 
@@ -128,7 +127,6 @@ func (ctrl *Controller) AddAuthor(c *gin.Context) {
 
 	c.Set(USER_LOG_KEY, author.NewLog())
 	c.Next()
-
 }
 
 func (ctrl *Controller) GetBookCount(c *gin.Context) {

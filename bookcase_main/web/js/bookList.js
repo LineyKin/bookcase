@@ -6,6 +6,7 @@ let paginatorItemCount = 0
 
 function buildPaginator() {
     let bookCount = getBookCount()
+    console.log("bookCount "+bookCount)
     let num = bookCount/rowsLimit
     paginatorItemCount = num - Math.trunc(num) == 0? num:  Math.trunc(num) + 1
     for (let i=1; i<= paginatorItemCount; i++) {
@@ -79,7 +80,7 @@ function getBookCount() {
     $.ajax({
         type: "GET",
         async: false,
-        url: "api/book/count/total",
+        url: "api/book/count",
         contentType: 'application/json; charset=utf-8',
         success: function (response) {
             count = response.count
