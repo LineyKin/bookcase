@@ -2,13 +2,8 @@ package handlers
 
 import (
 	"bookcase/internal/lib/jwtHelper"
-	"bookcase/models"
-	"bookcase/models/author"
-	"bookcase/models/book"
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 
@@ -17,61 +12,44 @@ import (
 
 const COOKIE_JWT_KEY = "bookcase_jwt"
 const USER_ID_KEY = "user_id"
+const LOGIN_KEY = "login"
+const USER_LOG_KEY = "user_log"
 
 type Middleware interface {
 	AuthMW() gin.HandlerFunc
 	LogMW() gin.HandlerFunc
 }
 
-func getObjectByPath(c *gin.Context) models.UserLogInterface {
-	var err error
-
-	defer func() {
+func (ctrl *Controller) LogMW() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userLog, err := ctrl.getUserLogFromContext(c)
 		if err != nil {
-			errOutput := fmt.Errorf("ошибка десериализации JSON во время логирования: %s", err)
-			log.Println(errOutput)
-			c.JSON(http.StatusBadRequest, gin.H{"error": errOutput})
+			log.Println("ошибка получения лога из контекста в LogMW()", err)
 			c.Abort()
 			return
 		}
-	}()
 
-	switch c.Request.URL.Path {
-	case ADD_AUTHOR_URL:
-		var author author.Author
-		err = c.BindJSON(&author)
-		return author
-	case ADD_BOOK_URL:
-		var book book.BookAdd
-		err = c.BindJSON(&book)
-		return book
-	default:
-		return nil
-	}
-}
-
-func (ctrl *Controller) LogMW() gin.HandlerFunc {
-	return func(c *gin.Context) {
-
-		// копируем тело запроса
-		body, err := io.ReadAll(c.Request.Body)
+		userId, _ := getUserId(c)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+			log.Println("ошибка получения id пользователя из контекста в LogMW()", err)
+			c.Abort()
 			return
 		}
 
-		// Возвращаем в контекст.
-		// Оно у нас опустошилось после копирования.
-		c.Request.Body = io.NopCloser(bytes.NewReader(body))
+		login, err := ctrl.getUserLogin(c)
+		if err != nil {
+			log.Println("ошибка получения логина из контекста в LogMW()", err)
+			c.Abort()
+			return
+		}
 
-		userLog := getObjectByPath(c).NewLog()
-		userId, _ := getUserId(c)
 		userLog.Id = userId
+		userLog.Login = login
 
 		// если продюсер кафки не активен, завершаем хэндлер
 		if ctrl.kp == nil {
 			log.Println("лог не передан в кафку из-за её неактивности")
-			c.Next()
+			c.Abort()
 			return
 		}
 
@@ -91,10 +69,7 @@ func (ctrl *Controller) LogMW() gin.HandlerFunc {
 			return
 		}
 
-		// Снова возвращаем тело в контекст.
-		// Оно у нас опустошилось после чтения в getObjectByPath()
-		c.Request.Body = io.NopCloser(bytes.NewReader(body))
-		c.Next()
+		c.Abort()
 	}
 }
 
@@ -110,14 +85,17 @@ func (ctrl *Controller) AuthMW() gin.HandlerFunc {
 			return
 		}
 
-		userId, err := jwtHelper.GetUserId(tokenString)
+		userInfo, err := jwtHelper.GetUserInfo(tokenString)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("ошибка получения id пользователя: %s", err)})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("ошибка получения данных пользователя из jwt: %s", err)})
 			c.Abort()
 			return
 		}
 
-		c.Set(USER_ID_KEY, userId)
+		log.Println("jwtHelper userInfo", userInfo)
+
+		c.Set(USER_ID_KEY, userInfo[jwtHelper.USER_ID_INDEX])
+		c.Set(LOGIN_KEY, userInfo[jwtHelper.USER_LOGIN_INDEX])
 		c.Next()
 	}
 }

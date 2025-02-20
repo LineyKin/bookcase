@@ -60,8 +60,9 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	a.gin.POST(
 		handlers.ADD_AUTHOR_URL,
 		a.hand.AuthMW(),
+		a.hand.AddAuthor,
 		a.hand.LogMW(),
-		a.hand.AddAuthor)
+	)
 
 	// ручка для выгрузки списка книг пользователя
 	a.gin.GET("api/book/list", a.hand.AuthMW(), a.hand.GetBookList)
@@ -79,8 +80,8 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	a.gin.POST(
 		handlers.ADD_BOOK_URL,
 		a.hand.AuthMW(),
-		a.hand.LogMW(),
 		a.hand.AddBook,
+		a.hand.LogMW(),
 	)
 
 	// ручка выгрузки авторов для подсказки в форме добавления книги

@@ -7,19 +7,32 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func GetUserId(token string) (interface{}, error) {
+const USER_ID_INDEX = 0
+const USER_LOGIN_INDEX = 1
+
+func GetUserInfo(token string) ([2]any, error) {
 	const WHERE = "jwtHelper GetUserId():"
 	jwtData, err := GetClaims(token)
+	userInfo := [2]any{}
 	if err != nil {
-		return 0, fmt.Errorf("%s невозможно получить данные о пользователе: %s", WHERE, err.Error())
+		return userInfo, fmt.Errorf("%s невозможно получить данные о пользователе: %s", WHERE, err.Error())
 	}
 
 	userIdRaw, ok := jwtData["id"]
 	if !ok {
-		return 0, fmt.Errorf("%s в jwt отсутствует id пользователя", WHERE)
+		return userInfo, fmt.Errorf("%s в jwt отсутствует id пользователя", WHERE)
 	}
 
-	return userIdRaw, nil
+	userInfo[USER_ID_INDEX] = userIdRaw
+
+	loginRaw, ok := jwtData["login"]
+	if !ok {
+		return userInfo, fmt.Errorf("%s в jwt отсутствует login пользователя", WHERE)
+	}
+
+	userInfo[USER_LOGIN_INDEX] = loginRaw
+
+	return userInfo, nil
 }
 
 func GetClaims(token string) (jwt.MapClaims, error) {

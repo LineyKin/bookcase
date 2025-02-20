@@ -99,7 +99,7 @@ func (s *PostgresStorage) AddLog(lr models.LogRow) error {
 	)
 
 	if err != nil {
-		log.Println("can't add new author: %w", err)
+		log.Println("can't add new log: %w", err)
 	}
 
 	return nil

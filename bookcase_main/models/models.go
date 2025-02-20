@@ -10,6 +10,7 @@ type UserLogInterface interface {
 
 type UserLog struct {
 	Id        int       `json:"user_id"`
+	Login     string    `json:"login"`
 	Message   string    `json:"message"`
 	Timestamp time.Time `json:"timestamp"`
 }

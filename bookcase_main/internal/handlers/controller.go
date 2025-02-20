@@ -64,7 +64,11 @@ func (ctrl *Controller) AddBook(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	c.Set(USER_LOG_KEY, b.NewLog())
+
 	c.JSON(http.StatusOK, gin.H{"new_book": b})
+
+	c.Next()
 }
 
 func (ctrl *Controller) GetPublishingHouseList(c *gin.Context) {
@@ -113,6 +117,7 @@ func (ctrl *Controller) AddAuthor(c *gin.Context) {
 	}
 
 	id, err := ctrl.service.AddAuthor(author)
+	author.Id = id
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -120,6 +125,9 @@ func (ctrl *Controller) AddAuthor(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"author_id": id})
+
+	c.Set(USER_LOG_KEY, author.NewLog())
+	c.Next()
 
 }
 
