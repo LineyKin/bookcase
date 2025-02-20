@@ -39,13 +39,13 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	a.gin = gin.Default()
 
 	// ручка для главной страницы
-	a.gin.GET("/", a.hand.AuthMiddleware(), a.hand.FileServer)
+	a.gin.GET("/", a.hand.AuthMW(), a.hand.FileServer)
 
 	// ручка страницы регистрации
 	a.gin.GET("/auth", a.hand.FileServer)
 
 	// ручка страницы общего списка книг
-	a.gin.GET("/total", a.hand.AuthMiddleware(), a.hand.FileServer)
+	a.gin.GET("/total", a.hand.AuthMW(), a.hand.FileServer)
 
 	a.gin.Static("/style", "./web/style")
 	a.gin.Static("/js", "./web/js")
@@ -59,18 +59,18 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	// ручка добавления авторов
 	a.gin.POST(
 		handlers.ADD_AUTHOR_URL,
-		a.hand.AuthMiddleware(),
-		a.hand.LogToKafkaMiddleware(),
+		a.hand.AuthMW(),
+		a.hand.LogMW(),
 		a.hand.AddAuthor)
 
 	// ручка для выгрузки списка книг пользователя
-	a.gin.GET("api/book/list", a.hand.AuthMiddleware(), a.hand.GetBookList)
+	a.gin.GET("api/book/list", a.hand.AuthMW(), a.hand.GetBookList)
 
 	// ручка для выгрузки списка книг пользователя
-	a.gin.GET("api/book/list/total", a.hand.AuthMiddleware(), a.hand.GetBookListTotal)
+	a.gin.GET("api/book/list/total", a.hand.AuthMW(), a.hand.GetBookListTotal)
 
 	// ручка для выгрузки количества книг пользователя
-	a.gin.GET("api/book/count", a.hand.AuthMiddleware(), a.hand.GetBookCount)
+	a.gin.GET("api/book/count", a.hand.AuthMW(), a.hand.GetBookCount)
 
 	// ручка для выгрузки количества книг всех пользователей
 	a.gin.GET("api/book/count/total", a.hand.GetBookCountTotal)
@@ -78,16 +78,16 @@ func New(appDB db.AppDB, kp *kafka.Producer) (*App, error) {
 	// ручка добавления книги
 	a.gin.POST(
 		handlers.ADD_BOOK_URL,
-		a.hand.AuthMiddleware(),
-		a.hand.LogToKafkaMiddleware(),
+		a.hand.AuthMW(),
+		a.hand.LogMW(),
 		a.hand.AddBook,
 	)
 
 	// ручка выгрузки авторов для подсказки в форме добавления книги
-	a.gin.GET("api/author/hint", a.hand.AuthMiddleware(), a.hand.GetAuthorList)
+	a.gin.GET("api/author/hint", a.hand.AuthMW(), a.hand.GetAuthorList)
 
 	// ручка выгрузки списка издательств
-	a.gin.GET("api/publishingHouse/list", a.hand.AuthMiddleware(), a.hand.GetPublishingHouseList)
+	a.gin.GET("api/publishingHouse/list", a.hand.AuthMW(), a.hand.GetPublishingHouseList)
 
 	return a, nil
 }

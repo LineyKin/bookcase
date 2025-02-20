@@ -19,8 +19,8 @@ const COOKIE_JWT_KEY = "bookcase_jwt"
 const USER_ID_KEY = "user_id"
 
 type Middleware interface {
-	AuthMiddleware() gin.HandlerFunc
-	LogToKafkaMiddleware() gin.HandlerFunc
+	AuthMW() gin.HandlerFunc
+	LogMW() gin.HandlerFunc
 }
 
 func getObjectByPath(c *gin.Context) models.UserLogInterface {
@@ -50,7 +50,7 @@ func getObjectByPath(c *gin.Context) models.UserLogInterface {
 	}
 }
 
-func (ctrl *Controller) LogToKafkaMiddleware() gin.HandlerFunc {
+func (ctrl *Controller) LogMW() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		// копируем тело запроса
@@ -99,7 +99,7 @@ func (ctrl *Controller) LogToKafkaMiddleware() gin.HandlerFunc {
 }
 
 // Middleware для проверки JWT
-func (ctrl *Controller) AuthMiddleware() gin.HandlerFunc {
+func (ctrl *Controller) AuthMW() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString, err := c.Cookie(COOKIE_JWT_KEY)
 		if err != nil {
