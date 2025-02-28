@@ -6,7 +6,6 @@ import (
 	"bookcase/models/author"
 	"bookcase/models/book"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -25,21 +24,6 @@ func NewController(service service.ServiceInterface, kp *kafka.Producer) *Contro
 	}
 }
 
-func getUserId(c *gin.Context) (int, error) {
-	userIdRaw, ok := c.Get(USER_ID_KEY)
-	if !ok {
-		log.Println("no key: ", USER_ID_KEY)
-		return 0, fmt.Errorf("no key: %s", USER_ID_KEY)
-	}
-
-	userId, ok := userIdRaw.(float64)
-	if !ok {
-		return 0, fmt.Errorf("userId не является float64")
-	}
-
-	return int(userId), nil
-}
-
 func (ctrl *Controller) AddBook(c *gin.Context) {
 	if c.Request.Method != http.MethodPost {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Метод не поддерживается"})
@@ -53,7 +37,7 @@ func (ctrl *Controller) AddBook(c *gin.Context) {
 		return
 	}
 
-	userId, err := getUserId(c)
+	userId, err := ctrl.getUserId(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
 		return
@@ -135,7 +119,7 @@ func (ctrl *Controller) GetBookCount(c *gin.Context) {
 		return
 	}
 
-	userId, err := getUserId(c)
+	userId, err := ctrl.getUserId(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
 		return
@@ -188,7 +172,7 @@ func (ctrl *Controller) GetBookList(c *gin.Context) {
 	sortedBy := c.Query("sortedBy")
 	sortType := c.Query("sortType")
 
-	userId, err := getUserId(c)
+	userId, err := ctrl.getUserId(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("невозможно получить id пользователя: %s", err)})
 		return

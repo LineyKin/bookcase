@@ -29,7 +29,7 @@ func (ctrl *Controller) LogMW() gin.HandlerFunc {
 			return
 		}
 
-		userId, err := getUserId(c)
+		userId, err := ctrl.getUserId(c)
 		if err != nil {
 			log.Println("ошибка получения id пользователя из контекста в LogMW()", err)
 			c.Abort()
