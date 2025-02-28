@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"bookcase/models"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -9,9 +10,27 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+const REGISTER_ACTION = 1
+const LOGIN_ACTION = 2
+
 type AuthData struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
+	Action   int    `json:"action,omitempty"`
+}
+
+func (a AuthData) NewLog() models.UserLog {
+	ul := models.NewUserLog()
+	switch a.Action {
+	case LOGIN_ACTION:
+		ul.Message = fmt.Sprintf("Пользователь %s авторизовался на сайте", a.Login)
+	case REGISTER_ACTION:
+		ul.Message = fmt.Sprintf("Пользователь %s зарегистрировался на сайте", a.Login)
+	default:
+		ul.Message = fmt.Sprintf("Неизвестное действие пользователя %s", a.Login)
+	}
+
+	return ul
 }
 
 func (a AuthData) CalcPwdHash(pwd string) string {
