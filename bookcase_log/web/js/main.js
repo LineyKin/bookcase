@@ -64,7 +64,7 @@ function buildLogRow(obj) {
 function buildPaginator() {
     let logCount = getLogCount()
     let num = logCount/rowsLimit
-    paginatorItemCount = num%10 == 0? num:  Math.trunc(num) + 1
+    paginatorItemCount = num - Math.trunc(num) == 0? num:  Math.trunc(num) + 1
     for (let i=1; i<= paginatorItemCount; i++) {
         let newItem = '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>'
         $("#logListPagination").append(newItem)

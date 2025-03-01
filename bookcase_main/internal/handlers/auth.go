@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bookcase/internal/lib/jwtHelper"
 	"bookcase/models/auth"
 	"fmt"
 	"log"
@@ -38,6 +39,20 @@ func (ctrl *Controller) Register(c *gin.Context) {
 	}
 
 	setJWTCookie(c, jwt)
+
+	userInfo, err := jwtHelper.GetUserInfo(jwt)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("ошибка получения данных пользователя из jwt: %s", err)})
+		c.Abort()
+		return
+	}
+
+	c.Set(USER_ID_KEY, userInfo[jwtHelper.USER_ID_INDEX])
+	c.Set(LOGIN_KEY, userInfo[jwtHelper.USER_LOGIN_INDEX])
+
+	authData.Action = auth.REGISTER_ACTION
+	c.Set(USER_LOG_KEY, authData.NewLog())
+
 	c.JSON(http.StatusCreated, gin.H{})
 }
 
@@ -81,6 +96,20 @@ func (ctrl *Controller) Login(c *gin.Context) {
 	}
 
 	setJWTCookie(c, jwt)
+
+	userInfo, err := jwtHelper.GetUserInfo(jwt)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("ошибка получения данных пользователя из jwt: %s", err)})
+		c.Abort()
+		return
+	}
+
+	c.Set(USER_ID_KEY, userInfo[jwtHelper.USER_ID_INDEX])
+	c.Set(LOGIN_KEY, userInfo[jwtHelper.USER_LOGIN_INDEX])
+
+	authData.Action = auth.LOGIN_ACTION
+	c.Set(USER_LOG_KEY, authData.NewLog())
+
 	c.JSON(http.StatusAccepted, gin.H{})
 }
 

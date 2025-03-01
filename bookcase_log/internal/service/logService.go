@@ -43,6 +43,7 @@ func (s *logService) AddLog(msg *sarama.ConsumerMessage, ts time.Time) error {
 	}
 
 	lr := models.LogRow{
+		Id:          pd.Id,
 		Producer_ts: pd.Timestamp,
 		Consumer_ts: time.Now(),
 		Topic:       msg.Topic,

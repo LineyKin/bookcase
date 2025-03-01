@@ -79,7 +79,7 @@ function getBookCount() {
     $.ajax({
         type: "GET",
         async: false,
-        url: "api/book/count/total",
+        url: "api/book/count",
         contentType: 'application/json; charset=utf-8',
         success: function (response) {
             count = response.count
