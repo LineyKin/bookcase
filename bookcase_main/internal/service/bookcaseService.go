@@ -26,6 +26,32 @@ func (s *bookcaseService) GetBookList(userId, limit, offset int, sortedBy, sortT
 	return s.storage.GetBookList(userId, limit, offset, sortedBy, sortType)
 }
 
+func (s *bookcaseService) AddBook2(b book.BookAdd, userId int) (book.BookAdd, error) {
+	// 1. проверяем, чтобы было заполнено хотя бы одно проле с названием
+	if b.IsEmptyNameList() {
+		return b, errors.New("поле 'Название' не заполнено")
+	}
+
+	// 2. проверяем, заполнено ли поле с издательством
+	if b.PublishingHouse.IsEmpty() {
+		return b, errors.New("поле 'Издательство' не заполнено")
+	}
+
+	// 3. в зависимости от того новое ли у нас издательство,
+	// либо оно уже было в БД (выбрано из списка в форме)
+	// вызывается тот или иной метод.
+	if b.PublishingHouse.IsNew() {
+		err := s.storage.AddBookWithNewPublishingHouse(&b)
+		if err != nil {
+			return b, err
+		}
+	}
+
+	err := s.storage.AddBook(&b)
+
+	return b, err
+}
+
 func (s *bookcaseService) AddBook(b book.BookAdd, userId int) (book.BookAdd, error) {
 	// 1. проверка заполнено ли издательство
 	if b.PublishingHouse.IsEmpty() {

@@ -6,6 +6,7 @@ import (
 	"bookcase/models/author"
 	"bookcase/models/book"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -43,15 +44,20 @@ func (ctrl *Controller) AddBook(c *gin.Context) {
 		return
 	}
 
-	b, err := ctrl.service.AddBook(bookData, userId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	log.Println("bookData", bookData)
+	log.Println("userId", userId)
+	c.JSON(http.StatusInternalServerError, gin.H{"error": "сервис временно отключён"})
+	c.Abort()
 
-	c.JSON(http.StatusOK, gin.H{"new_book": b})
-	c.Set(USER_LOG_KEY, b.NewLog())
-	c.Next()
+	//b, err := ctrl.service.AddBook(bookData, userId)
+	//if err != nil {
+	//	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	//	return
+	//}
+
+	//c.JSON(http.StatusOK, gin.H{"new_book": b})
+	//c.Set(USER_LOG_KEY, b.NewLog())
+	//c.Next()
 }
 
 func (ctrl *Controller) GetPublishingHouseList(c *gin.Context) {

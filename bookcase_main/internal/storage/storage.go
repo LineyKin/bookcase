@@ -22,6 +22,8 @@ type StorageInterface interface {
 	GetBookListTotal(limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error)
 	GetAuthorByName(a author.Author) ([]int, error)
 	AuthInterface
+	AddBookWithNewPublishingHouse(b *book.BookAdd) error
+	AddBook(b *book.BookAdd) error
 }
 
 type Storage struct {
