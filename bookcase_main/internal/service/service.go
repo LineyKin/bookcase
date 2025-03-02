@@ -10,7 +10,6 @@ type ServiceInterface interface {
 	AddAuthor(a author.Author) (int, error)
 	GetAuthorList() ([]author.Author, error)
 	AddBook(b book.BookAdd, userId int) (book.BookAdd, error)
-	AddBook2(b book.BookAdd, userId int) (book.BookAdd, error)
 	GetPublishingHouseList() ([]book.PublishingHouse, error)
 	GetBookCount(userId int) (int, error)
 	GetBookCountTotal() (int, error)

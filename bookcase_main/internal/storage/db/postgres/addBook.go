@@ -7,78 +7,112 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func (s *PostgresStorage) AddLiteraryWork(lwName string) (int, error) {
-	q := `INSERT INTO literary_work (name) VALUES($1) RETURNING id`
-	var id int
-	err := s.db.QueryRow(
-		q,
-		lwName,
-	).Scan(&id)
+func (s *PostgresStorage) AddBookWithNewPublishingHouse(b *book.BookAdd, userId interface{}) error {
 
+	// Начинаем транзакцию
+	tx, err := s.db.Begin()
 	if err != nil {
-		return 0, fmt.Errorf("can't add new literary work: %w", err)
+		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
 
-	return id, nil
-}
+	// формируем запрос
+	q := `
+	WITH 
+		lwId AS (
+	    	INSERT INTO literary_work (name, authors)
+	    	VALUES %s
+	    	RETURNING id
+		),
+		phId AS (
+	    	INSERT INTO publishing_house (name)
+	    	VALUES ($2)
+	    	RETURNING id
+		)
+	INSERT INTO book (
+	    user_id, 
+	    publishing_house_id, 
+	    year_of_publication, 
+	    literary_works
+	)
+	VALUES(
+		$1,
+		(SELECT id FROM phId),
+		$3,
+		(SELECT array_agg(id) FROM lwId)
+	);`
 
-func (s *PostgresStorage) AddPhysicalBook(b *book.BookAdd, userId interface{}) (int, error) {
-	q := `INSERT INTO book (user_id, publishing_house_id, year_of_publication) VALUES($1, $2, $3) RETURNING id`
-	var id int
-	err := s.db.QueryRow(
+	q = fmt.Sprintf(q, b.GetLWInsertion())
+
+	_, err = tx.Exec(
 		q,
 		userId,
-		b.PublishingHouse.Id,
+		b.PublishingHouse.Name,
 		b.PublishingYear,
-	).Scan(&id)
-
-	if err != nil {
-		return 0, err
-	}
-
-	return id, nil
-}
-
-func (s *PostgresStorage) AddPublishingHouse(phName string) (int, error) {
-	q := `INSERT INTO publishing_house (name) VALUES($1) RETURNING id`
-	var id int
-	err := s.db.QueryRow(
-		q,
-		phName,
-	).Scan(&id)
-
-	if err != nil {
-		return 0, fmt.Errorf("can't add new publishing house: %w", err)
-	}
-
-	return id, nil
-}
-
-func (s *PostgresStorage) LinkAuthorAndLiteraryWork(authorId, bookId int) error {
-	q := `INSERT INTO author_and_literary_work (author_id, literary_work_id) VALUES($1, $2)`
-	_, err := s.db.Exec(
-		q,
-		authorId,
-		bookId,
+		b.GetAuthorIdsAsArrayForPG(), // $4 authors, массив id (прилетит в %s)
 	)
 
 	if err != nil {
-		return fmt.Errorf("can't link author and literary work: %w", err)
+		// Откатываем транзакцию в случае ошибки
+		tx.Rollback()
+		return fmt.Errorf("can't add new book with new publishing house: %w", err)
+	}
+
+	// Фиксируем транзакцию
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return nil
 }
 
-func (s *PostgresStorage) LinkBookAndLiteraryWork(lwId, bookId int) error {
-	q := `INSERT INTO book_and_literary_work (literary_work_id, book_id) VALUES($1, $2)`
-	_, err := s.db.Exec(
+func (s *PostgresStorage) AddBook(b *book.BookAdd, userId interface{}) error {
+	// Начинаем транзакцию
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	// формируем запрос
+	q := `
+	WITH lwId AS (
+	    INSERT INTO literary_work (name, authors)
+	    VALUES %s
+	    RETURNING id
+	)
+	INSERT INTO book (
+	    user_id, 
+	    publishing_house_id, 
+	    year_of_publication, 
+	    literary_works
+	)
+	SELECT 
+	    $1, 
+	    $2, 
+	    $3, 
+	    array_agg(id)
+	FROM lwId;`
+
+	q = fmt.Sprintf(q, b.GetLWInsertion())
+
+	_, err = tx.Exec(
 		q,
-		lwId,
-		bookId,
+		userId,
+		b.PublishingHouse.Id,
+		b.PublishingYear,
+		b.GetAuthorIdsAsArrayForPG(), // $4 authors, массив id (прилетит в %s)
 	)
 
 	if err != nil {
-		return fmt.Errorf("can't link literary work and book: %w", err)
+		// Откатываем транзакцию в случае ошибки
+		tx.Rollback()
+		return fmt.Errorf("can't add new book: %w", err)
+	}
+
+	// Фиксируем транзакцию
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return nil

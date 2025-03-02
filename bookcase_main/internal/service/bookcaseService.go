@@ -26,7 +26,7 @@ func (s *bookcaseService) GetBookList(userId, limit, offset int, sortedBy, sortT
 	return s.storage.GetBookList(userId, limit, offset, sortedBy, sortType)
 }
 
-func (s *bookcaseService) AddBook2(b book.BookAdd, userId int) (book.BookAdd, error) {
+func (s *bookcaseService) AddBook(b book.BookAdd, userId int) (book.BookAdd, error) {
 	// 1. проверяем, чтобы было заполнено хотя бы одно проле с названием
 	if b.IsEmptyNameList() {
 		return b, errors.New("поле 'Название' не заполнено")
@@ -48,110 +48,6 @@ func (s *bookcaseService) AddBook2(b book.BookAdd, userId int) (book.BookAdd, er
 	err := s.storage.AddBook(&b, userId)
 
 	return b, err
-}
-
-func (s *bookcaseService) AddBook(b book.BookAdd, userId int) (book.BookAdd, error) {
-	// 1. проверка заполнено ли издательство
-	if b.PublishingHouse.IsEmpty() {
-		return b, errors.New("поле 'Издательство' не заполнено")
-	}
-
-	// 2. для нового издательства получаем id (publishing_house_id)
-	// после добавления в БД
-	// в ином случае id прилетает с фронта сразу
-	if b.PublishingHouse.IsNew() {
-		err := s.addPublishingHouse(&b)
-		if err != nil {
-			return b, err
-		}
-	}
-
-	// 3. заполним таблицу book
-	// получим id книги
-	err := s.addPhysicalBook(&b, userId)
-	if err != nil {
-		return b, err
-	}
-
-	//4. работа с литературным произведением
-	// проверяем, чтобы было заполнено хотя бы одно проле с названием
-	if b.IsEmptyNameList() {
-		return b, errors.New("поле 'Название' не заполнено")
-	}
-
-	// булева переменная, указывающая на наличие автора у книги
-	hasAuthors := b.HasAuthors()
-
-	// перебираем литературные произведение (названия) lw - literary work
-	for _, lw := range b.Name {
-		if lw.IsEmpty() {
-			continue // одно название может быть пустым(на совести пользователя, может исправлю на фронте ещё)
-		}
-
-		// для нового литературного произведения получаем id (literary_work_id)
-		// после добавления в БД
-		// в ином случае id прилетает с фронта сразу
-		if lw.IsNew() {
-			err = s.addLiteraryWork(&lw)
-			if err != nil {
-				return b, err
-			}
-		}
-
-		// далее заполняем связующте таблицы в БД
-
-		// 4.1 заполним таблицу, связывающую физическую книгу и произведение, которые в ней (таблица book_and_literary_work)
-		err := s.storage.LinkBookAndLiteraryWork(lw.Id, b.Id)
-		if err != nil {
-			return b, err
-		}
-
-		// случай, когда авторов у книги нет : Библия, например
-		if !hasAuthors {
-			continue
-		}
-
-		// 4.2 заполним таблицу, связывающую произведение и автора(ов)
-		// перебираем авторов
-		for _, authorId := range b.Author {
-			err := s.storage.LinkAuthorAndLiteraryWork(authorId, lw.Id)
-			if err != nil {
-				return b, err
-			}
-		}
-	}
-
-	return b, nil
-}
-
-func (s *bookcaseService) addLiteraryWork(lw *book.LiteraryWork) error {
-	id, err := s.storage.AddLiteraryWork(lw.Name)
-	if err != nil {
-		return err
-	}
-
-	lw.Id = id
-	return nil
-}
-
-func (s *bookcaseService) addPhysicalBook(b *book.BookAdd, userId int) error {
-	id, err := s.storage.AddPhysicalBook(b, userId)
-	if err != nil {
-		return err
-	}
-
-	b.Id = id
-
-	return nil
-}
-
-func (s *bookcaseService) addPublishingHouse(b *book.BookAdd) error {
-	id, err := s.storage.AddPublishingHouse(b.PublishingHouse.Name)
-	if err != nil {
-		return err
-	}
-	b.PublishingHouse.Id = id
-	return nil
 }
 
 func (s *bookcaseService) AddAuthor(a author.Author) (int, error) {
