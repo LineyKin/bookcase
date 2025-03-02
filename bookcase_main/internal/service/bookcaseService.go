@@ -41,13 +41,13 @@ func (s *bookcaseService) AddBook2(b book.BookAdd, userId int) (book.BookAdd, er
 	// либо оно уже было в БД (выбрано из списка в форме)
 	// вызывается тот или иной метод.
 	if b.PublishingHouse.IsNew() {
-		err := s.storage.AddBookWithNewPublishingHouse(&b)
+		err := s.storage.AddBookWithNewPublishingHouse(&b, userId)
 		if err != nil {
 			return b, err
 		}
 	}
 
-	err := s.storage.AddBook(&b)
+	err := s.storage.AddBook(&b, userId)
 
 	return b, err
 }
