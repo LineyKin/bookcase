@@ -42,9 +42,7 @@ func (s *bookcaseService) AddBook2(b book.BookAdd, userId int) (book.BookAdd, er
 	// вызывается тот или иной метод.
 	if b.PublishingHouse.IsNew() {
 		err := s.storage.AddBookWithNewPublishingHouse(&b, userId)
-		if err != nil {
-			return b, err
-		}
+		return b, err
 	}
 
 	err := s.storage.AddBook(&b, userId)

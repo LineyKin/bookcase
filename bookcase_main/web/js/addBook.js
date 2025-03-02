@@ -96,9 +96,6 @@ $("#saveBook").on("click", function(){
         jwt: $.cookie("bookcase_jwt")
     }
 
-    console.log(bookData)
-    //return
-
     $.ajax({
         type: "POST",
         url: "api/book/add",

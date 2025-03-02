@@ -67,19 +67,8 @@ CREATE TABLE IF NOT EXISTS publishing_house (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(256) NOT NULL DEFAULT ''
 );
-ALTER SEQUENCE publishing_house_id_seq RESTART WITH 10;
 
 COMMENT ON TABLE publishing_house IS 'таблица издательств';
-INSERT INTO "publishing_house" ("id", "name") VALUES
-	(1, 'Эксмо'),
-	(2, 'АСТ'),
-	(3, 'Политиздат'),
-	(4, 'Мартин'),
-	(5, 'РИПОЛ классик'),
-	(6, 'Диалектика'),
-	(7, 'Научный мир'),
-	(8, 'Астрель'),
-	(9, 'Питер');
 
 
 -- ТАБЛИЦА С ПОЛЬЗОВАТЕЛЯМИ
