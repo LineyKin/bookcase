@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS authors (
 	last_name VARCHAR(256) NOT NULL DEFAULT ''
 );
 
-COMMENT ON TABLE authors IS 'таблица авторов: писателей, поэтов, публицистов'
+COMMENT ON TABLE authors IS 'таблица авторов: писателей, поэтов, публицистов';
 
 ALTER SEQUENCE authors_id_seq RESTART WITH 21;
 
@@ -37,8 +37,12 @@ CREATE TABLE IF NOT EXISTS literary_work (
 	authors INTEGER[]
 );
 
+-- индекс для более быстрых join-ов с таблицей literary_work по полю authors
+CREATE INDEX IF NOT EXISTS idx_lw_authors ON literary_work USING GIN (authors);
+
 COMMENT ON TABLE literary_work IS 'таблица художественных произведений (без привязки к физической книге)';
 COMMENT ON COLUMN literary_work.authors IS 'список айдишек авторов';
+COMMENT ON INDEX idx_lw_authors IS 'индекс для более быстрых join-ов с таблицей literary_work по полю authors';
 
 
 -- ТАБЛИЦА ФИЗИЧЕСКИХ КНИГ
@@ -50,15 +54,19 @@ CREATE TABLE IF NOT EXISTS book (
 	literary_works INTEGER[]
 );
 
+-- индекс для более быстрых join-ов с таблицей book по полю literary_works
+CREATE INDEX IF NOT EXISTS idx_book_lw ON book USING GIN (literary_works);
+
 COMMENT ON TABLE book IS 'таблица физических книг';
 COMMENT ON COLUMN book.literary_works IS 'список айдишек художественных произведений и работ';
+COMMENT ON INDEX idx_book_lw IS 'индекс для более быстрых join-ов с таблицей book по полю literary_works';
 
 
 -- ТАБЛИЦА ИЗДАТЕЛЬСТВ
 CREATE TABLE IF NOT EXISTS publishing_house (
-		id SERIAL PRIMARY KEY,
-		name VARCHAR(256) NOT NULL DEFAULT ''
-	);
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(256) NOT NULL DEFAULT ''
+);
 ALTER SEQUENCE publishing_house_id_seq RESTART WITH 10;
 
 COMMENT ON TABLE publishing_house IS 'таблица издательств';
@@ -88,4 +96,3 @@ CREATE UNIQUE INDEX idx_login_unique ON users (login);
 
 INSERT INTO "users" ("id", "login", "password") 
 VALUES (1, 'Sam', '51b21d529c47d8a88cc39d267fbddd704f19fdb353f5c5b3ca85080c5755715b');
-
