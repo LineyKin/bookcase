@@ -2,7 +2,7 @@ function createOptionForDatalist(id, name) {
     return '<option name="'+name+'" data-id="'+id+'">'+name+'</option>';
 }
 
-// кнопка, добавляющая ещё одно поле для автора, если у книги несколько авторов
+// кнопка, добавляющая в форме ещё одно поле для автора, если у книги несколько авторов
 $("#addAuthorBtn").on("click", function() {
     let authorRow = $(this).parent().parent()
     authorRow.after(`<tr>
@@ -18,7 +18,7 @@ $("#addAuthorBtn").on("click", function() {
     });
 });
 
-// добавления поля с произведением, если одна физическая кника содержит более одного произведения
+// добавление в форму поля с произведением, если одна физическая кника содержит более одного произведения
 // например "Час быка" и "Туманность Андромеды" - два романа Ефремова в одной физической книге
 $("#addWorkBtn").on("click", function() {
     let workRow = $(this).parent().parent()
@@ -95,6 +95,7 @@ $("#saveBook").on("click", function(){
         publishingYear: publishingYear,
         jwt: $.cookie("bookcase_jwt")
     }
+
     $.ajax({
         type: "POST",
         url: "api/book/add",

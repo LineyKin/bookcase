@@ -46,10 +46,11 @@ func (ctrl *Controller) AddBook(c *gin.Context) {
 	b, err := ctrl.service.AddBook(bookData, userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		c.Abort()
 	}
 
 	c.JSON(http.StatusOK, gin.H{"new_book": b})
+	c.Abort()
 	c.Set(USER_LOG_KEY, b.NewLog())
 	c.Next()
 }
