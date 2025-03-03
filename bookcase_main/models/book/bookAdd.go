@@ -22,7 +22,7 @@ func (b BookAdd) GetLWInsertion() string {
 
 	strList := make([]string, len(b.Name))
 	for i := 0; i < len(b.Name); i++ {
-		strList[i] = b.Name[i].Name
+		strList[i] = fmt.Sprintf("('%s', $4)", b.Name[i].Name)
 	}
 
 	return strings.Join(strList, ",")

@@ -31,8 +31,8 @@ func (s *PostgresStorage) GetBookList(userId, limit, offset int, sortedBy, sortT
 	q := `
 	SELECT
 		b.id,
-		STRING_AGG(DISTINCT a.last_name || ' ' || a.name, ',') AS author,
-		STRING_AGG(DISTINCT lw.name, ',') AS name,
+		STRING_AGG(DISTINCT a.last_name || ' ' || a.name, ', ') AS author,
+		STRING_AGG(DISTINCT lw.name, '; ') AS name,
 		ph.name AS publishing_house,
 		b.year_of_publication
 	FROM book AS b
@@ -84,8 +84,8 @@ func (s *PostgresStorage) GetBookListTotal(limit, offset int, sortedBy, sortType
 	SELECT 
 		b.id,
 		u.login AS user,
-		STRING_AGG(DISTINCT a.last_name || ' ' || a.name, ',') AS author,
-		STRING_AGG(DISTINCT lw.name, ',') AS name,
+		STRING_AGG(DISTINCT a.last_name || ' ' || a.name, ', ') AS author,
+		STRING_AGG(DISTINCT lw.name, '; ') AS name,
 		ph.name AS publishing_house,
 		b.year_of_publication
 	FROM book AS b
