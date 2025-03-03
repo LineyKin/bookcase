@@ -29,7 +29,7 @@ func getOrderBy(sortedBy, sortType string) string {
 
 func (s *PostgresStorage) GetBookList(userId, limit, offset int, sortedBy, sortType string) ([]book.BookUnload, error) {
 	q := `
-	SELECT 
+	SELECT
 		b.id,
 		STRING_AGG(DISTINCT a.last_name || ' ' || a.name, ',') AS author,
 		STRING_AGG(DISTINCT lw.name, ',') AS name,
@@ -37,10 +37,8 @@ func (s *PostgresStorage) GetBookList(userId, limit, offset int, sortedBy, sortT
 		b.year_of_publication
 	FROM book AS b
 	LEFT JOIN publishing_house AS ph ON ph.id = b.publishing_house_id
-	LEFT JOIN book_and_literary_work AS blw ON blw.book_id = b.id
-	LEFT JOIN literary_work AS lw ON lw.id = blw.literary_work_id
-	LEFT JOIN author_and_literary_work AS alw ON alw.literary_work_id = lw.id
-	LEFT JOIN authors AS a ON a.id = alw.author_id
+	LEFT JOIN literary_work AS lw ON lw.id = ANY(b.literary_works)
+	LEFT JOIN authors AS a ON a.id = ANY(lw.authors)
 	WHERE b.user_id = $3
 	GROUP BY b.id, ph.name
 	ORDER BY %s
@@ -92,10 +90,8 @@ func (s *PostgresStorage) GetBookListTotal(limit, offset int, sortedBy, sortType
 		b.year_of_publication
 	FROM book AS b
 	LEFT JOIN publishing_house AS ph ON ph.id = b.publishing_house_id
-	LEFT JOIN book_and_literary_work AS blw ON blw.book_id = b.id
-	LEFT JOIN literary_work AS lw ON lw.id = blw.literary_work_id
-	LEFT JOIN author_and_literary_work AS alw ON alw.literary_work_id = lw.id
-	LEFT JOIN authors AS a ON a.id = alw.author_id
+	LEFT JOIN literary_work AS lw ON lw.id = ANY(b.literary_works)
+	LEFT JOIN authors AS a ON a.id = ANY(lw.authors)
 	LEFT JOIN users AS u ON u.id = b.user_id
 	GROUP BY b.id, ph.name, u.login
 	ORDER BY %s
